@@ -1,4 +1,5 @@
 package chess;
+import java.util.ArrayList;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -22,6 +23,7 @@ public class ChessBoard {
         throw new RuntimeException("Not implemented");
     }
 
+
     /**
      * Gets a chess piece on the chessboard
      *
@@ -32,6 +34,7 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         throw new RuntimeException("Not implemented");
     }
+
 
     /**
      * Sets the board to the default starting board
