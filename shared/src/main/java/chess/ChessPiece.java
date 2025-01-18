@@ -10,7 +10,13 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
+    // TeamColor and PieceType are enums
+    public ChessGame.TeamColor color;
+    public ChessPiece.PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.color = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -29,15 +35,18 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
+
+    // use a switch statement. one line calls the piece moves calculator, another calls the piece-specific method
+    // piece moves calculator isn't a class, it's an interface
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -49,4 +58,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
     }
+
+    // add overrides
 }

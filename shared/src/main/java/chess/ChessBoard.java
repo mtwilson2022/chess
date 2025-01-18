@@ -1,4 +1,5 @@
 package chess;
+
 import java.util.ArrayList;
 
 /**
@@ -8,6 +9,7 @@ import java.util.ArrayList;
  * signature of the existing methods.
  */
 public class ChessBoard {
+
     // implement with a 2D array
     public ChessBoard() {
         
@@ -43,4 +45,7 @@ public class ChessBoard {
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
     }
+
+
+    // add overrides
 }
