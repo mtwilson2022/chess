@@ -11,8 +11,8 @@ import java.util.Collection;
 public class ChessPiece {
 
     // TeamColor and PieceType are enums
-    public ChessGame.TeamColor color;
-    public ChessPiece.PieceType type;
+    private ChessGame.TeamColor color;
+    private ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
