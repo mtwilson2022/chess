@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -10,9 +11,21 @@ import java.util.ArrayList;
  */
 public class ChessBoard {
 
-    // implement with a 2D array
+    private ArrayList<ArrayList<ChessPiece>> board;
+
+    /*
+    Creates a 2D 8x8 array populated with nulls.
+    The outer array consists of the rows (inner arrays), which consist of squares (contents of inner arrays)
+     */
     public ChessBoard() {
-        
+        this.board = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            var row = new ArrayList<ChessPiece>();
+            for (int j = 0; j < 8; j++) {
+                row.add(null);
+            }
+            this.board.add(row);
+        }
     }
 
     /**
@@ -22,9 +35,11 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        // convert row and col from 1-based indexing to 0-based
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+        board.get(row).set(col, piece);
     }
-
 
     /**
      * Gets a chess piece on the chessboard
@@ -34,18 +49,37 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        // convert row and col from 1-based indexing to 0-based
+        int row = position.getRow() - 1;
+        int col = position.getColumn() - 1;
+        return board.get(row).get(col);
     }
-
 
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for (int i = 0; i < 8; i++) {
+            board.get(i).clear();
+            for (int j = 0; j < 8; j++) {
+                board.get(i).add(null);
+            }
+        }
+
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.equals(board, that.board);
+    }
 
-    // add overrides
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(board);
+    }
 }
