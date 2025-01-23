@@ -60,6 +60,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        // first, clear the chess board
         for (int i = 0; i < 8; i++) {
             board.get(i).clear();
             for (int j = 0; j < 8; j++) {
@@ -67,6 +68,39 @@ public class ChessBoard {
             }
         }
 
+        // then add the pieces
+        addPieces(ChessGame.TeamColor.WHITE);
+        addPieces(ChessGame.TeamColor.BLACK);
+    }
+
+    /**
+     * Adds the pieces for a given color to the starting board
+     */
+    private void addPieces(ChessGame.TeamColor color) {
+        // get rows to add to
+        int back_row, pawn_row;
+        if (color == ChessGame.TeamColor.WHITE) {
+            back_row = 1;
+            pawn_row = 2;
+        } else { // if color == ChessGame.TeamColor.BLACK
+            back_row = 8;
+            pawn_row = 7;
+        }
+
+        // add the back row
+        addPiece(new ChessPosition(back_row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(back_row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(back_row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(back_row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(back_row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(back_row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(back_row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(back_row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+
+        // add the pawns
+        for (int i = 1; i <= 8; i++) {
+            addPiece(new ChessPosition(pawn_row, i), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+        }
     }
 
     @Override
@@ -81,5 +115,12 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Objects.hashCode(board);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "board=" + board +
+                '}';
     }
 }
