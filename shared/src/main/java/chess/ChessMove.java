@@ -45,7 +45,6 @@ public class ChessMove {
         return promotionPiece;
     }
 
-    // add overrides
 
     @Override
     public boolean equals(Object o) {
