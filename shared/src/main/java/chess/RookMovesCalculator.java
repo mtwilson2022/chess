@@ -32,7 +32,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
 
             // set up the potential move
             num_squares++;
-            ChessPosition new_position; // = new ChessPosition(curr_row, curr_col);
+            ChessPosition new_position;
             if (dir == Direction.UP) {
                 new_position = new ChessPosition(curr_row + num_squares, curr_col);
             } else if (dir == Direction.DOWN) {

@@ -44,7 +44,7 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
 
             // set up the potential move
             num_squares++;
-            ChessPosition new_position; // = new ChessPosition(curr_row, curr_col);
+            ChessPosition new_position;
 
             // Rook movement
             if (dir == Direction.UP) {
