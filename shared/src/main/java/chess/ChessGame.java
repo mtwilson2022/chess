@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -72,7 +73,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor enemyColor;
+        if (teamColor == TeamColor.WHITE) enemyColor = TeamColor.BLACK;
+        else enemyColor = TeamColor.WHITE;
+
+        var king_position = findKingPosition(this.board, teamColor);
+
+        // for each square, if it contains an enemy piece, find that piece's possible moves
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                var position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+
+                if (piece != null) {
+                    if (piece.getTeamColor() == enemyColor) {
+                        var possible_moves = piece.pieceMoves(this.board, position);
+                        // if the king's square is in the moves list, it is in check
+                        for (ChessMove move : possible_moves) {
+                            if (move.getEndPosition() == king_position) return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -94,6 +118,27 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     *
+     * @param board the current chessboard
+     * @param color which color of king you want to find
+     * @return The position of the king of the specified color
+     */
+    private ChessPosition findKingPosition(ChessBoard board, TeamColor color) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                var position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null) {
+                    if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color) {
+                        return position;
+                    }
+                }
+            }
+        }
+        return null; // this is just to make the compiler happy; if it can't find the king then the game falls apart
     }
 
     /**
