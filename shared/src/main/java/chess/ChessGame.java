@@ -90,7 +90,7 @@ public class ChessGame {
                         var possible_moves = piece.pieceMoves(this.board, position);
                         // if the king's square is in the moves list, it is in check
                         for (ChessMove move : possible_moves) {
-                            if (move.getEndPosition() == king_position) return true;
+                            if (move.getEndPosition().equals(king_position)) return true;
                         }
                     }
                 }
