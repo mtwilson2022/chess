@@ -76,19 +76,23 @@ public class ChessGame {
     private boolean isValidMove(ChessMove move, TeamColor color) {
         // make a deep copy of the board, change the chess game's board to the copy
         var game_board = getBoard();
-
+        var temp_board = game_board.clone();
+        setBoard(temp_board);
 
         // make the hypothetical move in the copied board
+        movePiece(move, temp_board);
 
         // after the move, see if the king is in check. Only if he isn't can the move be added
         // regardless, go back to the original board
-        if (isInCheck(color)) {
-            setBoard(game_board);
-            return false;
-        } else {
-            setBoard(game_board);
-            return true;
-        }
+        boolean valid = !isInCheck(color);
+        setBoard(game_board);
+        return valid;
+    }
+
+    private void movePiece(ChessMove move, ChessBoard board) {
+        var piece = board.getPiece(move.getStartPosition());
+        board.addPiece(move.getEndPosition(), piece);
+        board.addPiece(move.getStartPosition(), null);
     }
 
     /**
