@@ -53,7 +53,28 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        // begin by finding the piece and get all its possible moves
+        var piece = this.board.getPiece(startPosition);
+        if (piece == null) {
+            return null;
+        }
+        var all_moves = piece.pieceMoves(this.board, startPosition);
+
+        // next, filter out the moves that end with the king in check
+        var legal_moves = new ArrayList<ChessMove>();
+        var king_position = findKingPosition(this.board, piece.getTeamColor());
+        for (ChessMove move : all_moves) {
+            // make a deep copy of the board
+
+            // make the hypothetical move in the copied board
+
+            // after the move, see if the king is in check. Only if he isn't can the move be added
+            if ( !isInCheck(piece.getTeamColor()) ) {
+                legal_moves.add(move);
+            }
+        }
+
+        return legal_moves;
     }
 
     /**
