@@ -62,19 +62,33 @@ public class ChessGame {
 
         // next, filter out the moves that end with the king in check
         var legal_moves = new ArrayList<ChessMove>();
-        var king_position = findKingPosition(this.board, piece.getTeamColor());
+
         for (ChessMove move : all_moves) {
-            // make a deep copy of the board
-
-            // make the hypothetical move in the copied board
-
-            // after the move, see if the king is in check. Only if he isn't can the move be added
-            if ( !isInCheck(piece.getTeamColor()) ) {
+            if (isValidMove(move, piece.getTeamColor())) {
                 legal_moves.add(move);
             }
         }
 
         return legal_moves;
+    }
+
+
+    private boolean isValidMove(ChessMove move, TeamColor color) {
+        // make a deep copy of the board, change the chess game's board to the copy
+        var game_board = getBoard();
+
+
+        // make the hypothetical move in the copied board
+
+        // after the move, see if the king is in check. Only if he isn't can the move be added
+        // regardless, go back to the original board
+        if (isInCheck(color)) {
+            setBoard(game_board);
+            return false;
+        } else {
+            setBoard(game_board);
+            return true;
+        }
     }
 
     /**
@@ -121,27 +135,6 @@ public class ChessGame {
     }
 
     /**
-     * Determines if the given team is in checkmate
-     *
-     * @param teamColor which team to check for checkmate
-     * @return True if the specified team is in checkmate
-     */
-    public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    /**
-     * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves
-     *
-     * @param teamColor which team to check for stalemate
-     * @return True if the specified team is in stalemate, otherwise false
-     */
-    public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    /**
      *
      * @param board the current chessboard
      * @param color which color of king you want to find
@@ -160,6 +153,27 @@ public class ChessGame {
             }
         }
         return null; // this is just to make the compiler happy; if it can't find the king then the game falls apart
+    }
+
+    /**
+     * Determines if the given team is in checkmate
+     *
+     * @param teamColor which team to check for checkmate
+     * @return True if the specified team is in checkmate
+     */
+    public boolean isInCheckmate(TeamColor teamColor) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Determines if the given team is in stalemate, which here is defined as having
+     * no valid moves
+     *
+     * @param teamColor which team to check for stalemate
+     * @return True if the specified team is in stalemate, otherwise false
+     */
+    public boolean isInStalemate(TeamColor teamColor) {
+        throw new RuntimeException("Not implemented");
     }
 
     /**
