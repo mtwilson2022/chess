@@ -72,7 +72,12 @@ public class ChessGame {
         return legal_moves;
     }
 
-
+    /**
+     *
+     * @param move the move to test for validity
+     * @param color the team's color
+     * @return true if the move is legal, false otherwise
+     */
     private boolean isValidMove(ChessMove move, TeamColor color) {
         // make a deep copy of the board, change the chess game's board to the copy
         var game_board = getBoard();
@@ -80,7 +85,7 @@ public class ChessGame {
         setBoard(temp_board);
 
         // make the hypothetical move in the copied board
-        movePiece(move, temp_board);
+        moveThePiece(move, temp_board);
 
         // after the move, see if the king is in check. Only if he isn't can the move be added
         // regardless, go back to the original board
@@ -89,7 +94,12 @@ public class ChessGame {
         return valid;
     }
 
-    private void movePiece(ChessMove move, ChessBoard board) {
+    /**
+     * Carries out a move by changing the piece's location on the chessboard
+     * @param move the move to make
+     * @param board the current chessboard
+     */
+    private void moveThePiece(ChessMove move, ChessBoard board) {
         var piece = board.getPiece(move.getStartPosition());
         if (move.getPromotionPiece() != null) {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
@@ -122,7 +132,7 @@ public class ChessGame {
         boolean moved = false;
         for (ChessMove elem : moves) {
             if (move.equals(elem)) {
-                movePiece(move, this.board);
+                moveThePiece(move, this.board);
                 moved = true;
                 // change the team turn
                 if (this.teamTurn == TeamColor.WHITE) {
@@ -200,7 +210,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return allValidMoves(teamColor).isEmpty() && isInCheck(teamColor);
     }
 
     /**
@@ -211,7 +221,32 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return allValidMoves(teamColor).isEmpty() && !isInCheck(teamColor);
+    }
+
+    /**
+     * Finds every possible move for a player; used to determine checkmate and stalemate conditions
+     * @param color which team's turn it is
+     * @return a list of all moves that player could make
+     */
+    private Collection<ChessMove> allValidMoves(TeamColor color) {
+        var all_moves = new ArrayList<ChessMove>();
+
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                var position = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(position);
+
+                if (piece != null) {
+                    if (piece.getTeamColor() == color) {
+                        var possible_moves = validMoves(position);
+                        all_moves.addAll(possible_moves);
+                    }
+                }
+            }
+        }
+
+        return all_moves;
     }
 
     /**
