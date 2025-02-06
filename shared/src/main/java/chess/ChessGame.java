@@ -91,6 +91,10 @@ public class ChessGame {
 
     private void movePiece(ChessMove move, ChessBoard board) {
         var piece = board.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
     }
@@ -102,7 +106,37 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // first make sure there is a piece at the start square and get its valid moves
+        var moves = validMoves(move.getStartPosition());
+        if (moves == null) {
+            throw new InvalidMoveException();
+        }
+
+        // next make sure it's that piece's turn
+        var moving_color = this.board.getPiece(move.getStartPosition()).getTeamColor();
+        if (moving_color != this.teamTurn) {
+            throw new InvalidMoveException();
+        }
+
+        // next see if the move is valid. If it is, make the move. Otherwise, throw exception
+        boolean moved = false;
+        for (ChessMove elem : moves) {
+            if (move.equals(elem)) {
+                movePiece(move, this.board);
+                moved = true;
+                // change the team turn
+                if (this.teamTurn == TeamColor.WHITE) {
+                    this.teamTurn = TeamColor.BLACK;
+                } else {
+                    this.teamTurn = TeamColor.WHITE;
+                }
+                break;
+            }
+        }
+
+        if (!moved) {
+            throw new InvalidMoveException();
+        }
     }
 
     /**
