@@ -9,7 +9,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece implements Cloneable {
 
     // TeamColor and PieceType are enums
     private ChessGame.TeamColor color;
@@ -68,6 +68,15 @@ public class ChessPiece {
         return moves.calculateMoves(board, position);
     }
 
+
+    @Override
+    public ChessPiece clone() {
+        try {
+            return (ChessPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 
     @Override
     public boolean equals(Object o) {

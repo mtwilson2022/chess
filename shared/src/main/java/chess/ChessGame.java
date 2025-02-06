@@ -90,7 +90,7 @@ public class ChessGame {
     }
 
     private void movePiece(ChessMove move, ChessBoard board) {
-        var piece = board.getPiece(move.getStartPosition()); // !! gets null
+        var piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
     }

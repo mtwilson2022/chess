@@ -107,18 +107,23 @@ public class ChessBoard implements Cloneable {
     public ChessBoard clone() {
         try {
             ChessBoard clone = (ChessBoard) super.clone();
+            ArrayList<ArrayList<ChessPiece>> copy_board = new ArrayList<>();
 
             for (int i = 1; i <= 8; i++) {
+                ArrayList<ChessPiece> row = new ArrayList<>();
                 for (int j = 1; j <= 8; j++) {
                     var square = new ChessPosition(i, j);
-                    ChessPiece piece = getPiece(square);
-                    if (piece != null) {
-                        var clone_piece = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
-                        clone.addPiece(square, clone_piece);
+                    if (getPiece(square) == null) {
+                        row.add(j-1, null);
+                    } else {
+                        ChessPiece piece = getPiece(square).clone();
+                        row.add(j-1, piece);
                     }
                 }
+                copy_board.add(i-1, row);
             }
 
+            clone.board = copy_board;
             return clone;
 
         } catch (CloneNotSupportedException e) {

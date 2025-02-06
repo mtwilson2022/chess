@@ -10,10 +10,10 @@ public class RookMovesCalculator implements PieceMovesCalculator {
 
         // add moves going up
         addMoves(board, position, moves, Direction.UP);
-        // add moves going down
-        addMoves(board, position, moves, Direction.DOWN);
         // add moves going right
         addMoves(board, position, moves, Direction.RIGHT);
+        // add moves going down
+        addMoves(board, position, moves, Direction.DOWN);
         // add moves going left
         addMoves(board, position, moves, Direction.LEFT);
 
