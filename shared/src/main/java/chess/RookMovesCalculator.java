@@ -35,10 +35,10 @@ public class RookMovesCalculator implements PieceMovesCalculator {
             ChessPosition new_position;
             if (dir == Direction.UP) {
                 new_position = new ChessPosition(curr_row + num_squares, curr_col);
-            } else if (dir == Direction.DOWN) {
-                new_position = new ChessPosition(curr_row - num_squares, curr_col);
             } else if (dir == Direction.RIGHT) {
                 new_position = new ChessPosition(curr_row, curr_col + num_squares);
+            } else if (dir == Direction.DOWN) {
+                new_position = new ChessPosition(curr_row - num_squares, curr_col);
             } else { // if (dir == Direction.LEFT)
                 new_position = new ChessPosition(curr_row, curr_col - num_squares);
             }
