@@ -12,8 +12,8 @@ import java.util.Objects;
 public class ChessPiece implements Cloneable {
 
     // TeamColor and PieceType are enums
-    private ChessGame.TeamColor color;
-    private ChessPiece.PieceType type;
+    private final ChessGame.TeamColor color;
+    private final ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
