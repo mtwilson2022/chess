@@ -13,12 +13,14 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board;
+    private MoveHistory moveHistory;
 
     public ChessGame() {
         // settings for starting a new game
         this.teamTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
         board.resetBoard();
+        this.moveHistory = new MoveHistory();
     }
 
     /**
@@ -59,6 +61,14 @@ public class ChessGame {
             return null;
         }
         var all_moves = piece.pieceMoves(this.board, startPosition);
+
+        // add any special moves that may apply (castling, en passant)
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            var en_passant_move = PawnMovesCalculator.addEnPassantMove(this.moveHistory, this.board, startPosition);
+            if (en_passant_move != null) {
+                all_moves.add(en_passant_move);
+            }
+        }
 
         // next, filter out the moves that end with the king in check
         var legal_moves = new ArrayList<ChessMove>();
@@ -101,13 +111,30 @@ public class ChessGame {
      */
     private void moveThePiece(ChessMove move, ChessBoard board) {
         var piece = board.getPiece(move.getStartPosition());
+
+        // determine if a SPECIAL MOVE (promotion, castling, en passant) is occurring
+        // promotion
         if (move.getPromotionPiece() != null) {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+        // castling
+
+        // en passant
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            int end_col = move.getEndPosition().getColumn();
+            int start_col = move.getStartPosition().getColumn();
+            if (board.getPiece(move.getEndPosition()) == null && end_col != start_col) {
+                // en passant is occurring. There is a piece either to the left or right of the pawn
+                board.addPiece(new ChessPosition(move.getStartPosition().getRow(), end_col), null);
+            }
         }
 
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
     }
+
+
+    // is en_passanting()
 
     /**
      * Makes a move in a chess game
@@ -140,6 +167,7 @@ public class ChessGame {
                 } else {
                     this.teamTurn = TeamColor.WHITE;
                 }
+                this.moveHistory.addLastMove(move);
                 break;
             }
         }
@@ -266,4 +294,13 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
+
+    /**
+     * Gets all the in-game moves
+     * @return a deque of all the moves made in the game
+     */
+    public MoveHistory getMoveHistory() {
+        return this.moveHistory;
+    }
+
 }
