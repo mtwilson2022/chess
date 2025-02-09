@@ -64,4 +64,109 @@ public class KingMovesCalculator implements PieceMovesCalculator {
         }
     }
 
+    public static Collection<ChessMove> addCastlingMoves(ChessBoard board, MoveHistory history, ChessGame.TeamColor color, ChessGame game) {
+        var moves = new ArrayList<ChessMove>();
+        int king_row;
+        if (color == ChessGame.TeamColor.WHITE) {
+            king_row = 1;
+        } else {
+            king_row = 8;
+        }
+        var king_start_pos = new ChessPosition(king_row, 5);
+
+        if (canCastleKingside(board, history, color, game)) {
+            var castleRight = new ChessMove(king_start_pos, new ChessPosition(king_row, 7), null);
+            moves.add(castleRight);
+        }
+        if (canCastleQueenside(board, history, color, game)) {
+            var castleLeft = new ChessMove(king_start_pos, new ChessPosition(king_row, 3), null);
+            moves.add(castleLeft);
+        }
+        return moves;
+    }
+
+    private static boolean canCastleKingside(ChessBoard board, MoveHistory history, ChessGame.TeamColor color, ChessGame game) {
+        int king_row;
+        if (color == ChessGame.TeamColor.WHITE) {
+            king_row = 1;
+        } else {
+            king_row = 8;
+        }
+        var king_start_pos = new ChessPosition(king_row, 5);
+        var rook_start_pos = new ChessPosition(king_row, 8);
+
+        // check that neither the king nor the rook has moved
+        for (ChessMove move : history.getMoveHistory()) {
+            if (move.getStartPosition().equals(king_start_pos)) { // if king has moved
+                return false;
+            }
+            if (move.getStartPosition().equals(rook_start_pos)) { // if kingside rook has moved
+                return false;
+            }
+        }
+
+        // check that there are no pieces between the rook and the king
+        if (board.getPiece(new ChessPosition(king_row, 6)) != null
+                || board.getPiece(new ChessPosition(king_row, 7)) != null) {
+            return false;
+        }
+
+        // make sure the king is never in check
+        if (game.isInCheck(color)) {
+            return false;
+        }
+        if (!game.isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 6), null), color)) {
+            return false;
+        }
+        if (!game.isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 7), null), color)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean canCastleQueenside(ChessBoard board, MoveHistory history, ChessGame.TeamColor color, ChessGame game) {
+        int king_row;
+        if (color == ChessGame.TeamColor.WHITE) {
+            king_row = 1;
+        } else {
+            king_row = 8;
+        }
+        var king_start_pos = new ChessPosition(king_row, 5);
+        var rook_start_pos = new ChessPosition(king_row, 1);
+
+        // check that neither the king nor the rook has moved
+        for (ChessMove move : history.getMoveHistory()) {
+            if (move.getStartPosition().equals(king_start_pos)) { // if king has moved
+                return false;
+            }
+            if (move.getStartPosition().equals(rook_start_pos)) { // if kingside rook has moved
+                return false;
+            }
+        }
+
+        // check that there are no pieces between the rook and the king
+        if (board.getPiece(new ChessPosition(king_row, 4)) != null
+                || board.getPiece(new ChessPosition(king_row, 3)) != null
+                || board.getPiece(new ChessPosition(king_row, 2)) != null) {
+            return false;
+        }
+
+        // make sure the king is never in check
+        if (game.isInCheck(color)) {
+            return false;
+        }
+        if (!game.isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 4), null), color)) {
+            return false;
+        }
+        if (!game.isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 3), null), color)) {
+            return false;
+        }
+        if (!game.isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 2), null), color)) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

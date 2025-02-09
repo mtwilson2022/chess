@@ -10,6 +10,14 @@ public class MoveHistory {
         this.moveHistory = new ArrayDeque<>();
     }
 
+    /**
+     * Gets all the in-game moves
+     * @return a deque of all the moves made in the game
+     */
+    public Deque<ChessMove> getMoveHistory() {
+        return this.moveHistory;
+    }
+
     public ChessMove getLastMove() {
         return moveHistory.getLast();
     }

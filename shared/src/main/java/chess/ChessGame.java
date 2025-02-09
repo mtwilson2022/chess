@@ -69,6 +69,10 @@ public class ChessGame {
                 all_moves.add(en_passant_move);
             }
         }
+//        else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+//            var castling = addCastlingMoves(this.board, this.moveHistory, startPosition);
+//            all_moves.addAll(castling);
+//        }
 
         // next, filter out the moves that end with the king in check
         var legal_moves = new ArrayList<ChessMove>();
@@ -88,7 +92,7 @@ public class ChessGame {
      * @param color the team's color
      * @return true if the move is legal, false otherwise
      */
-    private boolean isValidMove(ChessMove move, TeamColor color) {
+    public boolean isValidMove(ChessMove move, TeamColor color) {
         // make a deep copy of the board, change the chess game's board to the copy
         var game_board = getBoard();
         var temp_board = game_board.clone();
@@ -118,6 +122,19 @@ public class ChessGame {
             piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
         }
         // castling
+        if (move.getEndPosition().getColumn() == move.getStartPosition().getColumn() + 2) { // kingside castle
+            var king_row = move.getEndPosition().getRow();
+            var rook_pos = new ChessPosition(king_row, 8);
+            var rook = board.getPiece(rook_pos);
+            board.addPiece(new ChessPosition(king_row, 6), rook);
+            board.addPiece(rook_pos, null);
+        } else if (move.getEndPosition().getColumn() == move.getStartPosition().getColumn() - 2) { // queenside castle
+            var king_row = move.getEndPosition().getRow();
+            var rook_pos = new ChessPosition(king_row, 1);
+            var rook = board.getPiece(rook_pos);
+            board.addPiece(new ChessPosition(king_row, 4), rook);
+            board.addPiece(rook_pos, null);
+        }
 
         // en passant
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
@@ -132,9 +149,6 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
     }
-
-
-    // is en_passanting()
 
     /**
      * Makes a move in a chess game
@@ -295,12 +309,117 @@ public class ChessGame {
         return this.board;
     }
 
-    /**
-     * Gets all the in-game moves
-     * @return a deque of all the moves made in the game
-     */
-    public MoveHistory getMoveHistory() {
-        return this.moveHistory;
-    }
 
+//    public Collection<ChessMove> addCastlingMoves(ChessBoard board, MoveHistory history, ChessPosition king_position) {
+//        var moves = new ArrayList<ChessMove>();
+//
+//        if (board.getPiece(king_position) == null) {
+//            return null;
+//        }
+//        var color = board.getPiece(king_position).getTeamColor();
+//
+//        if (canCastleKingside(board, history, color)) {
+//            var castleRight = new ChessMove(king_position, new ChessPosition(king_position.getRow(), 7), null);
+//            moves.add(castleRight);
+//        }
+//        if (canCastleQueenside(board, history, color)) {
+//            var castleLeft = new ChessMove(king_position, new ChessPosition(king_position.getRow(), 3), null);
+//            moves.add(castleLeft);
+//        }
+//        return moves;
+//    }
+//
+//    private boolean canCastleKingside(ChessBoard board, MoveHistory history, ChessGame.TeamColor color) {
+//        int king_row;
+//        if (color == ChessGame.TeamColor.WHITE) {
+//            king_row = 1;
+//        } else {
+//            king_row = 8;
+//        }
+//        var king_start_pos = new ChessPosition(king_row, 5);
+//        var rook_start_pos = new ChessPosition(king_row, 8);
+//
+//        // check that neither the king nor the rook has moved
+//        for (ChessMove move : history.getMoveHistory()) {
+////            if (move.getStartPosition().equals(king_start_pos)) { // if king has moved (comment out for dumb Castling tests)
+////                return false;
+////            }
+//            if (move.getStartPosition().equals(rook_start_pos)) { // if kingside rook has moved
+//                return false;
+//            }
+//        }
+//        if (board.getPiece(king_start_pos) == null || board.getPiece(king_start_pos).getPieceType() != ChessPiece.PieceType.KING) {
+//            return false;
+//        } else if (board.getPiece(rook_start_pos) == null || board.getPiece(rook_start_pos).getPieceType() != ChessPiece.PieceType.ROOK) {
+//            return false;
+//        }
+//
+//        // check that there are no pieces between the rook and the king
+//        if (board.getPiece(new ChessPosition(king_row, 6)) != null
+//                || board.getPiece(new ChessPosition(king_row, 7)) != null) {
+//            return false;
+//        }
+//
+//        // make sure the king is never in check
+//        if (isInCheck(color)) {
+//            return false;
+//        }
+//        if (!isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 6), null), color)) {
+//            return false;
+//        }
+//        if (!isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 7), null), color)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
+//
+//    private boolean canCastleQueenside(ChessBoard board, MoveHistory history, ChessGame.TeamColor color) {
+//        int king_row;
+//        if (color == ChessGame.TeamColor.WHITE) {
+//            king_row = 1;
+//        } else {
+//            king_row = 8;
+//        }
+//        var king_start_pos = new ChessPosition(king_row, 5);
+//        var rook_start_pos = new ChessPosition(king_row, 1);
+//
+//        // check that neither the king nor the rook has moved
+//        for (ChessMove move : history.getMoveHistory()) {
+////            if (move.getStartPosition().equals(king_start_pos)) { // if king has moved (comment out for dumb Castling tests)
+////                return false;
+////            }
+//            if (move.getStartPosition().equals(rook_start_pos)) { // if kingside rook has moved
+//                return false;
+//            }
+//        }
+//        if (board.getPiece(king_start_pos) == null || board.getPiece(king_start_pos).getPieceType() != ChessPiece.PieceType.KING) {
+//            return false;
+//        } else if (board.getPiece(rook_start_pos) == null || board.getPiece(rook_start_pos).getPieceType() != ChessPiece.PieceType.ROOK) {
+//            return false;
+//        }
+//
+//        // check that there are no pieces between the rook and the king
+//        if (board.getPiece(new ChessPosition(king_row, 4)) != null
+//                || board.getPiece(new ChessPosition(king_row, 3)) != null
+//                || board.getPiece(new ChessPosition(king_row, 2)) != null) {
+//            return false;
+//        }
+//
+//        // make sure the king is never in check
+//        if (isInCheck(color)) {
+//            return false;
+//        }
+//        if (!isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 4), null), color)) {
+//            return false;
+//        }
+//        if (!isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 3), null), color)) {
+//            return false;
+//        }
+//        if (!isValidMove(new ChessMove(king_start_pos, new ChessPosition(king_row, 2), null), color)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 }
