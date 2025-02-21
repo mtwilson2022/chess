@@ -4,13 +4,12 @@ import model.GameData;
 import java.util.List;
 
 public interface GameDAO {
-    GameData getGame(String gameID);
-    List<GameData> listGames(String username, String playerColor);
+    GameData getGame(int gameID);
+    List<GameData> listGames();
 
-    void createGame(String gameName, String gameID);
-    void updateGame(GameData game);
-    void updateGame(String username, String playerColor);
+    void createNewGame(String gameName, int gameID);
+    void updateGame(String username, String playerColor, GameData game);
 
-    void deleteGame(String gameID);
+    void deleteGame(int gameID);
     void clearAllGames();
 }
