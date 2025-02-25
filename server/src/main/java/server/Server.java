@@ -4,6 +4,12 @@ import spark.*;
 
 public class Server {
 
+    // instance vars (Handler objects) go here
+
+    public Server() {
+        // initialize handlers
+    }
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
