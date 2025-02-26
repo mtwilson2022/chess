@@ -18,7 +18,7 @@ public class MemUserDAO implements UserDAO {
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void insertUser(UserData user) {
         users.put(user.username(), user);
     }
 

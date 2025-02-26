@@ -19,7 +19,7 @@ public class MemAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void createAuth(AuthData auth) {
+    public void insertAuth(AuthData auth) {
         auths.put(auth.authToken(), auth);
     }
 

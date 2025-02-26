@@ -1,4 +1,7 @@
 package handler;
 
-public class LoginHandler {
+public class LoginHandler extends HttpHandler {
+
+    // handle DataAccessExceptions here
+
 }

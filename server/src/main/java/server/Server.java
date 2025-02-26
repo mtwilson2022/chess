@@ -1,5 +1,6 @@
 package server;
 
+import service.UserService;
 import spark.*;
 
 public class Server {
@@ -8,6 +9,7 @@ public class Server {
 
     public Server() {
         // initialize handlers
+            // initialize DAOs and pass them into instances of service classes, which you give to handlers
     }
 
     public int run(int desiredPort) {
