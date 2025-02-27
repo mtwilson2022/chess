@@ -9,12 +9,7 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
-
-import response.*;
-import service.UserService;
 import request.*;
-
-import java.util.UUID;
 
 public class UserServiceTests {
 
@@ -47,14 +42,10 @@ public class UserServiceTests {
     @Test
     public void failLogin() {
         var requestWrongPassword = new LoginRequest("user1", "not right");
-        Assertions.assertThrows(UnauthorizedException.class, () -> {
-            service.login(requestWrongPassword);
-        });
+        Assertions.assertThrows(UnauthorizedException.class, () -> service.login(requestWrongPassword));
 
         var requestNotAUser = new LoginRequest("not a registered user", "abc");
-        Assertions.assertThrows(UnauthorizedException.class, () -> {
-            service.login(requestNotAUser);
-        });
+        Assertions.assertThrows(UnauthorizedException.class, () -> service.login(requestNotAUser));
     }
 
     @Test
@@ -74,9 +65,7 @@ public class UserServiceTests {
     @Test
     public void failRegister() {
         var requestAlreadyAUser = new RegisterRequest("user1", "new password", "rand_email");
-        Assertions.assertThrows(AlreadyTakenException.class, () -> {
-            service.register(requestAlreadyAUser);
-        });
+        Assertions.assertThrows(AlreadyTakenException.class, () -> service.register(requestAlreadyAUser));
     }
 
     @Test
@@ -93,8 +82,6 @@ public class UserServiceTests {
     public void failLogout() {
         String token = "bad token";
         var req = new LogoutRequest(token);
-        Assertions.assertThrows(UnauthorizedException.class, () -> {
-            service.logout(req);
-        });
+        Assertions.assertThrows(UnauthorizedException.class, () -> service.logout(req));
     }
 }
