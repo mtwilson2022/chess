@@ -1,6 +1,7 @@
 package handler;
 
 import dataaccess.AlreadyTakenException;
+import response.FailResponse;
 import service.BadRequestException;
 import service.UserService;
 import spark.Request;
@@ -22,9 +23,16 @@ public class UserHandler {
         var registerReq = gson.fromJson(req.body(), RegisterRequest.class);
         try {
             var registerRes = service.register(registerReq);
+            res.body(gson.toJson(registerRes));
+            res.status(200);
             return gson.toJson(registerRes);
+
         } catch (AlreadyTakenException ate) {
-            return null; // TODO: change
+            String errMessage = ate.getMessage();
+            res.body(errMessage);
+            res.status(403);
+            return gson.toJson(new FailResponse(errMessage));
+
         } catch (BadRequestException bre) {
             return null; // TODO: change
         }

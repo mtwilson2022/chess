@@ -40,7 +40,7 @@ public class Server {
 
         // exceptions
 
-//            res.body(gson.toJson(registerRes)); TODO: figure out what to do with status codes etc. How does server return stuff to client?
+//            res.body(gson.toJson(registerRes)); TODO: just change status codes in handler without returning result? How does server return stuff to client?
 //            res.status(200);
 //            return res;
 
