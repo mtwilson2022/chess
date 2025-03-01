@@ -3,9 +3,9 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 public class MemGameDAO implements GameDAO {
 
@@ -21,8 +21,8 @@ public class MemGameDAO implements GameDAO {
     }
 
     @Override
-    public List<GameData> listGames() {
-        return (List<GameData>) games.values();
+    public Collection<GameData> listGames() {
+        return games.values();
     }
 
     @Override
