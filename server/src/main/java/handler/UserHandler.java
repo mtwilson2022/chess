@@ -22,9 +22,7 @@ public class UserHandler {
         var registerReq = gson.fromJson(req.body(), RegisterRequest.class);
         try {
             var registerRes = service.register(registerReq);
-            res.body(gson.toJson(registerRes));
-            res.status(200);
-            return res;
+            return gson.toJson(registerRes);
         } catch (AlreadyTakenException ate) {
             return null; // TODO: change
         } catch (BadRequestException bre) {

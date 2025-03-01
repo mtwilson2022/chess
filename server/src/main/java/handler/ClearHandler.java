@@ -20,8 +20,6 @@ public class ClearHandler {
     public Object clear(Request req, Response res) {
         ClearRequest clearReq = gson.fromJson(req.body(), ClearRequest.class);
         var clearRes = service.clear(clearReq);
-        res.body(gson.toJson(clearRes));
-        res.status(200);
-        return res;
+        return gson.toJson(clearRes);
     }
 }
