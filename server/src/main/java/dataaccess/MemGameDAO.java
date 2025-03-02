@@ -3,9 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MemGameDAO implements GameDAO {
 
@@ -21,8 +19,14 @@ public class MemGameDAO implements GameDAO {
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        return games.values();
+    public List<GameData> listGames() {
+        var gameCollection = games.values();
+        return new ArrayList<>(gameCollection);
+    }
+
+    @Override
+    public Set<Integer> getAllGameIDs() {
+        return games.keySet();
     }
 
     @Override
@@ -32,8 +36,8 @@ public class MemGameDAO implements GameDAO {
     }
 
     @Override
-    public void updateGame(String username, String playerColor, GameData game) {
-        GameData updatedGame = game.updateGame(username, playerColor);
+    public void updateGame(String username, String playerColor, Integer gameID) {
+        GameData updatedGame = games.get(gameID).update(username, playerColor);
         games.put(updatedGame.gameID(), updatedGame);
     }
 
