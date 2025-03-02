@@ -70,7 +70,7 @@ public class UserServiceTests {
 
     @Test
     public void successLogout() {
-        String token = "some_token"; // need to figure out how to get the right token
+        String token = "some_token";
         var testAuthData = new AuthData(token, "user1");
         authDAO.insertAuth(testAuthData);
 

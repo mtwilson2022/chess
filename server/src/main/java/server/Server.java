@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class Server {
 
-    // instance vars (Handler objects) go here
     private final ClearHandler clearHandler;
     private final UserHandler userHandler;
     private final GameHandler gameHandler;
@@ -30,7 +29,7 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        // Register your endpoints and handle exceptions here.
+        // Endpoints and exceptions
         Spark.delete("/db", clearHandler::clear);
         Spark.post("/user", userHandler::register);
         Spark.post("/session", userHandler::login);
@@ -39,13 +38,7 @@ public class Server {
         Spark.post("/game", gameHandler::createGame);
         Spark.put("/game", gameHandler::joinGame);
 
-        // exceptions
         Spark.exception(Exception.class, this::errorHandler);
-
-        // TODO: How does server return stuff to client?
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-//        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();

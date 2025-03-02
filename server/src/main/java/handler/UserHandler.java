@@ -33,7 +33,8 @@ public class UserHandler extends HttpHandler {
             return sendAlreadyTakenResponse(errMessage, res, gson);
 
         } catch (BadRequestException bre) {
-            return null; // TODO: change
+            String errMessage = bre.getMessage();
+            return sendBadRequestResponse(errMessage, res, gson);
         }
     }
 
@@ -50,7 +51,7 @@ public class UserHandler extends HttpHandler {
     }
 
     public Object logout(Request req, Response res) {
-        String token = req.headers("authorization:"); // not sure if this is exactly the header to look for
+        String token = req.headers("Authorization");
         var logoutReq = new LogoutRequest(token);
         try {
             LogoutResponse logoutRes = service.logout(logoutReq);

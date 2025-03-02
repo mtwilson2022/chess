@@ -7,7 +7,6 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 
-
 public class ClearHandler extends HttpHandler {
     private final ClearService service;
     private final Gson gson;

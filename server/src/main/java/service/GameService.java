@@ -23,8 +23,8 @@ public class GameService {
     }
 
     public ListGamesResponse listGames(ListGamesRequest req) throws UnauthorizedException {
-        var token = authDAO.getAuth(req.authToken());
-        if (token == null) {
+        var auth = authDAO.getAuth(req.authToken());
+        if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
@@ -37,8 +37,8 @@ public class GameService {
             throw new BadRequestException("Error: bad request");
         }
 
-        var token = authDAO.getAuth(req.authToken());
-        if (token == null) {
+        var auth = authDAO.getAuth(req.authToken());
+        if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
@@ -57,11 +57,11 @@ public class GameService {
             throw new BadRequestException("Error: bad request");
         }
 
-        var token = authDAO.getAuth(req.authToken());
-        if (token == null) {
+        var auth = authDAO.getAuth(req.authToken());
+        if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
-        var username = token.username();
+        var username = auth.username();
 
         var game = gameDAO.getGame(req.gameID());
 
