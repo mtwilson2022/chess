@@ -22,7 +22,7 @@ public class GameHandler extends HttpHandler {
     }
 
     public Object listGames(Request req, Response res) {
-        String token = req.headers("Authorization:");
+        String token = req.headers("Authorization");
         var listGamesReq = new ListGamesRequest(token);
         try {
             ListGamesResponse listGamesRes = service.listGames(listGamesReq);
@@ -36,7 +36,7 @@ public class GameHandler extends HttpHandler {
 
     public Object createGame(Request req, Response res) {
         var initialReq = gson.fromJson(req.body(), CreateGameRequest.class);
-        String token = req.headers("Authorization:");
+        String token = req.headers("Authorization");
         CreateGameRequest createGameReq = initialReq.setAuthToken(token);
 
         try {
@@ -55,7 +55,7 @@ public class GameHandler extends HttpHandler {
 
     public Object joinGame(Request req, Response res) {
         var initialReq = gson.fromJson(req.body(), JoinGameRequest.class);
-        String token = req.headers("Authorization:");
+        String token = req.headers("Authorization");
         JoinGameRequest joinGameReq = initialReq.setAuthToken(token);
 
         try {

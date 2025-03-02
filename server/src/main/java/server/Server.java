@@ -49,11 +49,11 @@ public class Server {
         Spark.awaitStop();
     }
 
-    public Object errorHandler(Exception e, Request ignoredReq, Response res) {
+    public void errorHandler(Exception e, Request ignoredReq, Response res) {
         var body = new Gson().toJson(Map.of("message", String.format("Error: %s", e.getMessage()), "success", false));
         res.type("application/json");
         res.status(500);
         res.body(body);
-        return body;
+//        return body;
     }
 }
