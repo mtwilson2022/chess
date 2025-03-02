@@ -1,4 +1,4 @@
 package response;
 
-public record ClearResponse() {
+public record ClearResponse() implements Response {
 }

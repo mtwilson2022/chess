@@ -14,15 +14,15 @@ import java.util.Random;
 
 public class GameService {
 
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
 
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
 
-    public ListGamesResponse listGames(ListGamessRequest req) throws UnauthorizedException {
+    public ListGamesResponse listGames(ListGamesRequest req) throws UnauthorizedException {
         var token = authDAO.getAuth(req.authToken());
         if (token == null) {
             throw new UnauthorizedException("Error: unauthorized");

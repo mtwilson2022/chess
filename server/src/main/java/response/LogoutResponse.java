@@ -1,4 +1,4 @@
 package response;
 
-public record LogoutResponse() {
+public record LogoutResponse() implements Response {
 }

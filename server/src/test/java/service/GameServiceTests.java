@@ -40,7 +40,7 @@ public class GameServiceTests {
 
     @Test
     public void successListGames() {
-        var req = new ListGamessRequest(validAuth);
+        var req = new ListGamesRequest(validAuth);
         try {
             var games = service.listGames(req);
             Assertions.assertEquals(3, games.gamesList().size());
@@ -51,7 +51,7 @@ public class GameServiceTests {
 
     @Test
     public void failListGames() {
-        var invalidReq = new ListGamessRequest("invalid authToken!");
+        var invalidReq = new ListGamesRequest("invalid authToken!");
         Assertions.assertThrows(UnauthorizedException.class, () -> service.listGames(invalidReq));
     }
 

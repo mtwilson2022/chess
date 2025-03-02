@@ -8,7 +8,7 @@ import spark.Response;
 import com.google.gson.Gson;
 
 
-public class ClearHandler {
+public class ClearHandler extends HttpHandler {
     private final ClearService service;
     private final Gson gson;
 
@@ -19,9 +19,7 @@ public class ClearHandler {
 
     public Object clear(Request req, Response res) {
         ClearRequest clearReq = gson.fromJson(req.body(), ClearRequest.class);
-        var clearRes = service.clear(clearReq);
-        res.body(gson.toJson(clearRes));
-        res.status(200);
-        return gson.toJson(clearRes);
+        ClearResponse clearRes = service.clear(clearReq);
+        return sendSuccessfulResponse(clearRes, res, gson);
     }
 }
