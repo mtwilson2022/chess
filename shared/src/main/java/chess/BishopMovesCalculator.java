@@ -24,8 +24,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                           Collection<ChessMove> moves, PieceMovesCalculator.Direction dir) {
 
         ChessPiece movingPiece = board.getPiece(position); // the piece you are trying to move
-        int currRow = position.getRow();
-        int currCol = position.getColumn();
 
         int numSquares = 0; // how many squares to move in a certain direction
         boolean canMove = true;
