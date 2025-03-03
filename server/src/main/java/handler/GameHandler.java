@@ -34,6 +34,12 @@ public class GameHandler extends HttpHandler {
         }
     }
 
+    // need to make complex type adapter thingy?
+//    private static Gson listGameSerializer() {
+//        GsonBuilder builder = new GsonBuilder();
+//
+//    }
+
     public Object createGame(Request req, Response res) {
         var initialReq = gson.fromJson(req.body(), CreateGameRequest.class);
         String token = req.headers("Authorization");

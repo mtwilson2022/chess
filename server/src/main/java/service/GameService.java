@@ -50,8 +50,10 @@ public class GameService {
     }
 
     public JoinGameResponse joinGame(JoinGameRequest req) throws UnauthorizedException, BadRequestException, AlreadyTakenException {
-        // bad request if invalid team color (e.g. "GREEN") or nonexistent gameID entered
-        if (!req.playerColor().equalsIgnoreCase("WHITE") && !req.playerColor().equalsIgnoreCase("BLACK")) {
+        // bad request if invalid team color (e.g. "GREEN" or null) or nonexistent gameID entered
+        if (req.playerColor() == null) {
+            throw new BadRequestException("Error: bad request");
+        } else if (!req.playerColor().equalsIgnoreCase("WHITE") && !req.playerColor().equalsIgnoreCase("BLACK")) {
             throw new BadRequestException("Error: bad request");
         } else if (!gameDAO.getAllGameIDs().contains(req.gameID())) {
             throw new BadRequestException("Error: bad request");
