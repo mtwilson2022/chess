@@ -51,4 +51,21 @@ public interface PieceMovesCalculator {
         }
     }
 
+    default boolean addMoveIfLegal(ChessMove move, ChessBoard board, Collection<ChessMove> moves,
+                                   ChessPosition newPosition, ChessPiece movingPiece) {
+        if (outOfBounds(move)) {
+            return false;
+        }
+        else if (isOccupiedSquare(board, move)) { // if move square is occupied
+            // if the move square has a same-color piece, can't go there
+            if (board.getPiece(newPosition).getTeamColor() != movingPiece.getTeamColor()) {
+                moves.add(move); // if the move square has opposite-color piece, add move then stop
+            }
+            return false;
+        }
+        else {
+            moves.add(move);
+            return true;
+        }
+    }
 }

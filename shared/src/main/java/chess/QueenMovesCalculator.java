@@ -40,11 +40,12 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         int currCol = position.getColumn();
 
         int numSquares = 0; // how many squares to move in a certain direction
-        while (true) {
+        boolean canMove = true;
+        while (canMove) {
 
             // set up the potential move
             numSquares++;
-            ChessPosition newPosition;
+            ChessPosition newPosition = position;
 
             // Rook movement
             if (dir == Direction.UP) {
@@ -58,34 +59,21 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
             }
 
             // Bishop movement
-            else if (dir == Direction.UP_RIGHT) {
-                newPosition = new ChessPosition(currRow + numSquares, currCol + numSquares);
-            } else if (dir == Direction.DOWN_RIGHT) {
+            else if (dir == Direction.DOWN_RIGHT) {
                 newPosition = new ChessPosition(currRow - numSquares, currCol + numSquares);
             } else if (dir == Direction.UP_LEFT) {
                 newPosition = new ChessPosition(currRow + numSquares, currCol - numSquares);
-            } else { // if (dir == Direction.DOWN_LEFT)
+            } else if (dir == Direction.UP_RIGHT) {
+                newPosition = new ChessPosition(currRow + numSquares, currCol + numSquares);
+            } else if (dir == Direction.DOWN_LEFT) {
                 newPosition = new ChessPosition(currRow - numSquares, currCol - numSquares);
             }
 
             var move = new ChessMove(position, newPosition, null);
 
             // check if it's a legal move
-            if (outOfBounds(move)) {
-                break;
-            }
-            else if (isOccupiedSquare(board, move)) { // if move square is occupied
-                // if the move square has a same-color piece, can't go there
-                if (board.getPiece(newPosition).getTeamColor() == movingPiece.getTeamColor()) {
-                    break;
-                } else { // if the move square has opposite-color piece, add move then stop
-                    moves.add(move);
-                    break;
-                }
-            }
-            else {
-                moves.add(move);
-            }
+            canMove = addMoveIfLegal(move, board, moves, newPosition, movingPiece);
+
         }
 
     }

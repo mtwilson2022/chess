@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class MemUserDAO implements UserDAO {
 
-    private Map<String, UserData> users;  // maps usernames to their UserData objects
+    private final Map<String, UserData> users;  // maps usernames to their UserData objects
 
     public MemUserDAO() {
         this.users = new HashMap<>();

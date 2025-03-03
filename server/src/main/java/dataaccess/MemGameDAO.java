@@ -7,7 +7,7 @@ import java.util.*;
 
 public class MemGameDAO implements GameDAO {
 
-    private Map<Integer, GameData> games;  // maps gameIDs to their GameData objects
+    private final Map<Integer, GameData> games;  // maps gameIDs to their GameData objects
 
     public MemGameDAO() {
         this.games = new HashMap<>();

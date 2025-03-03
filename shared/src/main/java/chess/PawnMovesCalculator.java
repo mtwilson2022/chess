@@ -48,34 +48,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
 
         // diagonal attacking motion (to the right)
-        var rightSquare = new ChessPosition(currRow + 1, currCol + 1);
-        var moveRight = new ChessMove(position, rightSquare, null);
-
-        if (!outOfBounds(moveRight) && isOccupiedSquare(board, moveRight)) {
-            if (board.getPiece(rightSquare).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                // if moving to promotion square, add moves with promotion
-                if (rightSquare.getRow() == 8) {
-                    addPromoMoves(position, rightSquare, moves);
-                } else {
-                    moves.add(moveRight);
-                }
-            }
-        }
-
+        addAttackMove(ChessGame.TeamColor.WHITE, Direction.RIGHT, position, board, moves);
         // diagonal attacking motion (to the left)
-        var leftSquare = new ChessPosition(currRow + 1, currCol - 1);
-        var moveLeft = new ChessMove(position, leftSquare, null);
-
-        if (!outOfBounds(moveLeft) && isOccupiedSquare(board, moveLeft)) {
-            if (board.getPiece(leftSquare).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                // if moving to promotion square, add moves with promotion
-                if (leftSquare.getRow() == 8) {
-                    addPromoMoves(position, leftSquare, moves);
-                } else {
-                    moves.add(moveLeft);
-                }
-            }
-        }
+        addAttackMove(ChessGame.TeamColor.WHITE, Direction.LEFT, position, board, moves);
     }
 
     /*
@@ -109,34 +84,58 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
 
         // diagonal attacking motion (to the right)
-        var rightSquare = new ChessPosition(currRow - 1, currCol + 1);
-        var moveRight = new ChessMove(position, rightSquare, null);
-
-        if (!outOfBounds(moveRight) && isOccupiedSquare(board, moveRight)) {
-            if (board.getPiece(rightSquare).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                // if moving to promotion square, add moves with promotion
-                if (rightSquare.getRow() == 1) {
-                    addPromoMoves(position, rightSquare, moves);
-                } else {
-                    moves.add(moveRight);
-                }
-            }
-        }
-
+        addAttackMove(ChessGame.TeamColor.BLACK, Direction.RIGHT, position, board, moves);
         // diagonal attacking motion (to the left)
-        var leftSquare = new ChessPosition(currRow - 1, currCol - 1);
-        var moveLeft = new ChessMove(position, leftSquare, null);
+        addAttackMove(ChessGame.TeamColor.BLACK, Direction.LEFT, position, board, moves);
+    }
 
-        if (!outOfBounds(moveLeft) && isOccupiedSquare(board, moveLeft)) {
-            if (board.getPiece(leftSquare).getTeamColor() == ChessGame.TeamColor.WHITE) {
+    /*
+    Adds a move to a diagonal square after checking that it's a legal move.
+     */
+    private void addAttackMove(ChessGame.TeamColor color, Direction direction,
+                               ChessPosition position, ChessBoard board, Collection<ChessMove> moves) {
+        // determine the direction of attack
+        ChessPosition moveSquare = getMoveSquare(color, direction, position);
+        ChessMove move = new ChessMove(position, moveSquare, null);
+
+        if (!outOfBounds(move) && isOccupiedSquare(board, move)) {
+            if (color == ChessGame.TeamColor.WHITE &&
+                    board.getPiece(move.getEndPosition()).getTeamColor() == ChessGame.TeamColor.BLACK) {
                 // if moving to promotion square, add moves with promotion
-                if (leftSquare.getRow() == 1) {
-                    addPromoMoves(position, leftSquare, moves);
+                if (moveSquare.getRow() == 8) {
+                    addPromoMoves(position, moveSquare, moves);
                 } else {
-                    moves.add(moveLeft);
+                    moves.add(move);
+                }
+            } else if (color == ChessGame.TeamColor.BLACK &&
+                    board.getPiece(move.getEndPosition()).getTeamColor() == ChessGame.TeamColor.WHITE) {
+                if (moveSquare.getRow() == 1) {
+                    addPromoMoves(position, moveSquare, moves);
+                } else {
+                    moves.add(move);
                 }
             }
         }
+    }
+
+    private static ChessPosition getMoveSquare(ChessGame.TeamColor color, Direction direction, ChessPosition position) {
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
+        ChessPosition moveSquare;
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (direction == Direction.RIGHT) {
+                moveSquare = new ChessPosition(currRow + 1, currCol + 1);
+            } else { // direction == LEFT
+                moveSquare = new ChessPosition(currRow + 1, currCol - 1);
+            }
+        } else { // color == BLACK
+            if (direction == Direction.RIGHT) {
+                moveSquare = new ChessPosition(currRow - 1, currCol + 1);
+            } else { // direction == LEFT
+                moveSquare = new ChessPosition(currRow - 1, currCol - 1);
+            }
+        }
+        return moveSquare;
     }
 
     /*

@@ -28,7 +28,8 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         int currCol = position.getColumn();
 
         int numSquares = 0; // how many squares to move in a certain direction
-        while (true) {
+        boolean canMove = true;
+        while (canMove) {
 
             // set up the potential move
             numSquares++;
@@ -45,21 +46,8 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             var move = new ChessMove(position, newPosition, null);
 
             // check if it's a legal move
-            if (outOfBounds(move)) {
-                break;
-            }
-            else if (isOccupiedSquare(board, move)) { // if move square is occupied
-                // if the move square has a same-color piece, can't go there
-                if (board.getPiece(newPosition).getTeamColor() == movingPiece.getTeamColor()) {
-                    break;
-                } else { // if the move square has opposite-color piece, add move then stop
-                    moves.add(move);
-                    break;
-                }
-            }
-            else {
-                moves.add(move);
-            }
+            canMove = addMoveIfLegal(move, board, moves, newPosition, movingPiece);
+
         }
 
     }
