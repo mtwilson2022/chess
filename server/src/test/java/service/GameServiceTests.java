@@ -43,7 +43,7 @@ public class GameServiceTests {
         var req = new ListGamesRequest(validAuth);
         try {
             var games = service.listGames(req);
-            Assertions.assertEquals(3, games.gamesList().size());
+            Assertions.assertEquals(3, games.games().size());
         } catch (UnauthorizedException e) {
             throw new RuntimeException(e);
         }
