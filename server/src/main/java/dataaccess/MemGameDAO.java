@@ -42,11 +42,6 @@ public class MemGameDAO implements GameDAO {
     }
 
     @Override
-    public void deleteGame(int gameID) {
-        games.remove(gameID);
-    }
-
-    @Override
     public void clearAllGames() {
         games.clear();
     }

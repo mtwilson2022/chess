@@ -20,7 +20,7 @@ public class GameServiceTests {
     String validAuth;
 
     @BeforeEach
-    public void SetUp() {
+    public void setUp() {
         this.gameDAO = new MemGameDAO();
         this.authDAO = new MemAuthDAO();
         this.service = new GameService(gameDAO, authDAO);

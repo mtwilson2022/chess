@@ -23,26 +23,26 @@ public class RookMovesCalculator implements PieceMovesCalculator {
     private void addMoves(ChessBoard board, ChessPosition position,
                          Collection<ChessMove> moves, PieceMovesCalculator.Direction dir) {
 
-        ChessPiece moving_piece = board.getPiece(position); // the piece you are trying to move
-        int curr_row = position.getRow();
-        int curr_col = position.getColumn();
+        ChessPiece movingPiece = board.getPiece(position); // the piece you are trying to move
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
 
-        int num_squares = 0; // how many squares to move in a certain direction
+        int numSquares = 0; // how many squares to move in a certain direction
         while (true) {
 
             // set up the potential move
-            num_squares++;
-            ChessPosition new_position;
+            numSquares++;
+            ChessPosition newPosition;
             if (dir == Direction.UP) {
-                new_position = new ChessPosition(curr_row + num_squares, curr_col);
+                newPosition = new ChessPosition(currRow + numSquares, currCol);
             } else if (dir == Direction.RIGHT) {
-                new_position = new ChessPosition(curr_row, curr_col + num_squares);
+                newPosition = new ChessPosition(currRow, currCol + numSquares);
             } else if (dir == Direction.DOWN) {
-                new_position = new ChessPosition(curr_row - num_squares, curr_col);
+                newPosition = new ChessPosition(currRow - numSquares, currCol);
             } else { // if (dir == Direction.LEFT)
-                new_position = new ChessPosition(curr_row, curr_col - num_squares);
+                newPosition = new ChessPosition(currRow, currCol - numSquares);
             }
-            var move = new ChessMove(position, new_position, null);
+            var move = new ChessMove(position, newPosition, null);
 
             // check if it's a legal move
             if (outOfBounds(move)) {
@@ -50,7 +50,7 @@ public class RookMovesCalculator implements PieceMovesCalculator {
             }
             else if (isOccupiedSquare(board, move)) { // if move square is occupied
                 // if the move square has a same-color piece, can't go there
-                if (board.getPiece(new_position).getTeamColor() == moving_piece.getTeamColor()) {
+                if (board.getPiece(newPosition).getTeamColor() == movingPiece.getTeamColor()) {
                     break;
                 } else { // if the move square has opposite-color piece, add move then stop
                     moves.add(move);

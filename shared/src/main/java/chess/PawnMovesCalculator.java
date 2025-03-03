@@ -23,54 +23,56 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     They promote only if they are moving to rank 8.
      */
     private void pawnMovesWhite(ChessBoard board, ChessPosition position, Collection<ChessMove> moves) {
-        int curr_row = position.getRow();
-        int curr_col = position.getColumn();
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
 
         // forward motion
-        var forward_square = new ChessPosition(curr_row + 1, curr_col);
-        var move = new ChessMove(position, forward_square, null); // default move (without promotion)
+        var forwardSquare = new ChessPosition(currRow + 1, currCol);
+        var move = new ChessMove(position, forwardSquare, null); // default move (without promotion)
 
         if (!outOfBounds(move) && !isOccupiedSquare(board, move)) {
             // if moving to promotion square, add moves with promotion
-            if (forward_square.getRow() == 8) {
-                addPromoMoves(position, forward_square, moves);
+            if (forwardSquare.getRow() == 8) {
+                addPromoMoves(position, forwardSquare, moves);
             } else {
                 moves.add(move);
                 // conditions for moving 2 squares forward
-                if (curr_row == 2) {
-                    var second_forward_square = new ChessPosition(curr_row + 2, curr_col);
-                    var second_move = new ChessMove(position, second_forward_square, null);
-                    if (!outOfBounds(second_move) && !isOccupiedSquare(board, second_move)) moves.add(second_move);
+                if (currRow == 2) {
+                    var secondForwardSquare = new ChessPosition(currRow + 2, currCol);
+                    var secondMove = new ChessMove(position, secondForwardSquare, null);
+                    if (!outOfBounds(secondMove) && !isOccupiedSquare(board, secondMove)) {
+                        moves.add(secondMove);
+                    }
                 }
             }
         }
 
         // diagonal attacking motion (to the right)
-        var right_square = new ChessPosition(curr_row + 1, curr_col + 1);
-        var move_right = new ChessMove(position, right_square, null);
+        var rightSquare = new ChessPosition(currRow + 1, currCol + 1);
+        var moveRight = new ChessMove(position, rightSquare, null);
 
-        if (!outOfBounds(move_right) && isOccupiedSquare(board, move_right)) {
-            if (board.getPiece(right_square).getTeamColor() == ChessGame.TeamColor.BLACK) {
+        if (!outOfBounds(moveRight) && isOccupiedSquare(board, moveRight)) {
+            if (board.getPiece(rightSquare).getTeamColor() == ChessGame.TeamColor.BLACK) {
                 // if moving to promotion square, add moves with promotion
-                if (right_square.getRow() == 8) {
-                    addPromoMoves(position, right_square, moves);
+                if (rightSquare.getRow() == 8) {
+                    addPromoMoves(position, rightSquare, moves);
                 } else {
-                    moves.add(move_right);
+                    moves.add(moveRight);
                 }
             }
         }
 
         // diagonal attacking motion (to the left)
-        var left_square = new ChessPosition(curr_row + 1, curr_col - 1);
-        var move_left = new ChessMove(position, left_square, null);
+        var leftSquare = new ChessPosition(currRow + 1, currCol - 1);
+        var moveLeft = new ChessMove(position, leftSquare, null);
 
-        if (!outOfBounds(move_left) && isOccupiedSquare(board, move_left)) {
-            if (board.getPiece(left_square).getTeamColor() == ChessGame.TeamColor.BLACK) {
+        if (!outOfBounds(moveLeft) && isOccupiedSquare(board, moveLeft)) {
+            if (board.getPiece(leftSquare).getTeamColor() == ChessGame.TeamColor.BLACK) {
                 // if moving to promotion square, add moves with promotion
-                if (left_square.getRow() == 8) {
-                    addPromoMoves(position, left_square, moves);
+                if (leftSquare.getRow() == 8) {
+                    addPromoMoves(position, leftSquare, moves);
                 } else {
-                    moves.add(move_left);
+                    moves.add(moveLeft);
                 }
             }
         }
@@ -82,54 +84,56 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     They promote only if they are moving to rank 1.
      */
     private void pawnMovesBlack(ChessBoard board, ChessPosition position, Collection<ChessMove> moves) {
-        int curr_row = position.getRow();
-        int curr_col = position.getColumn();
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
 
         // forward motion
-        var forward_square = new ChessPosition(curr_row - 1, curr_col);
-        var move = new ChessMove(position, forward_square, null); // default move (without promotion)
+        var forwardSquare = new ChessPosition(currRow - 1, currCol);
+        var move = new ChessMove(position, forwardSquare, null); // default move (without promotion)
 
         if (!outOfBounds(move) && !isOccupiedSquare(board, move)) {
             // if moving to promotion square, add moves with promotion
-            if (forward_square.getRow() == 1) {
-                addPromoMoves(position, forward_square, moves);
+            if (forwardSquare.getRow() == 1) {
+                addPromoMoves(position, forwardSquare, moves);
             } else {
                 moves.add(move);
                 // conditions for moving 2 squares forward
-                if (curr_row == 7) {
-                    var second_forward_square = new ChessPosition(curr_row - 2, curr_col);
-                    var second_move = new ChessMove(position, second_forward_square, null);
-                    if (!outOfBounds(second_move) && !isOccupiedSquare(board, second_move)) moves.add(second_move);
+                if (currRow == 7) {
+                    var secondForwardSquare = new ChessPosition(currRow - 2, currCol);
+                    var secondMove = new ChessMove(position, secondForwardSquare, null);
+                    if (!outOfBounds(secondMove) && !isOccupiedSquare(board, secondMove)) {
+                        moves.add(secondMove);
+                    }
                 }
             }
         }
 
         // diagonal attacking motion (to the right)
-        var right_square = new ChessPosition(curr_row - 1, curr_col + 1);
-        var move_right = new ChessMove(position, right_square, null);
+        var rightSquare = new ChessPosition(currRow - 1, currCol + 1);
+        var moveRight = new ChessMove(position, rightSquare, null);
 
-        if (!outOfBounds(move_right) && isOccupiedSquare(board, move_right)) {
-            if (board.getPiece(right_square).getTeamColor() == ChessGame.TeamColor.WHITE) {
+        if (!outOfBounds(moveRight) && isOccupiedSquare(board, moveRight)) {
+            if (board.getPiece(rightSquare).getTeamColor() == ChessGame.TeamColor.WHITE) {
                 // if moving to promotion square, add moves with promotion
-                if (right_square.getRow() == 1) {
-                    addPromoMoves(position, right_square, moves);
+                if (rightSquare.getRow() == 1) {
+                    addPromoMoves(position, rightSquare, moves);
                 } else {
-                    moves.add(move_right);
+                    moves.add(moveRight);
                 }
             }
         }
 
         // diagonal attacking motion (to the left)
-        var left_square = new ChessPosition(curr_row - 1, curr_col - 1);
-        var move_left = new ChessMove(position, left_square, null);
+        var leftSquare = new ChessPosition(currRow - 1, currCol - 1);
+        var moveLeft = new ChessMove(position, leftSquare, null);
 
-        if (!outOfBounds(move_left) && isOccupiedSquare(board, move_left)) {
-            if (board.getPiece(left_square).getTeamColor() == ChessGame.TeamColor.WHITE) {
+        if (!outOfBounds(moveLeft) && isOccupiedSquare(board, moveLeft)) {
+            if (board.getPiece(leftSquare).getTeamColor() == ChessGame.TeamColor.WHITE) {
                 // if moving to promotion square, add moves with promotion
-                if (left_square.getRow() == 1) {
-                    addPromoMoves(position, left_square, moves);
+                if (leftSquare.getRow() == 1) {
+                    addPromoMoves(position, leftSquare, moves);
                 } else {
-                    moves.add(move_left);
+                    moves.add(moveLeft);
                 }
             }
         }
@@ -138,28 +142,28 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     /*
     This method is called only when a pawn reaches a promotion square and adds all possible promotion moves.
      */
-    private void addPromoMoves(ChessPosition start_pos, ChessPosition end_pos, Collection<ChessMove> moves) {
-        moves.add(new ChessMove(start_pos, end_pos, ChessPiece.PieceType.BISHOP));
-        moves.add(new ChessMove(start_pos, end_pos, ChessPiece.PieceType.KNIGHT));
-        moves.add(new ChessMove(start_pos, end_pos, ChessPiece.PieceType.ROOK));
-        moves.add(new ChessMove(start_pos, end_pos, ChessPiece.PieceType.QUEEN));
+    private void addPromoMoves(ChessPosition startPos, ChessPosition endPos, Collection<ChessMove> moves) {
+        moves.add(new ChessMove(startPos, endPos, ChessPiece.PieceType.BISHOP));
+        moves.add(new ChessMove(startPos, endPos, ChessPiece.PieceType.KNIGHT));
+        moves.add(new ChessMove(startPos, endPos, ChessPiece.PieceType.ROOK));
+        moves.add(new ChessMove(startPos, endPos, ChessPiece.PieceType.QUEEN));
     }
 
 
-    public static ChessMove addEnPassantMove(MoveHistory history, ChessBoard board, ChessPosition pawn_position) {
-        int row = pawn_position.getRow();
-        int col = pawn_position.getColumn();
+    public static ChessMove addEnPassantMove(MoveHistory history, ChessBoard board, ChessPosition pawnPosition) {
+        int row = pawnPosition.getRow();
+        int col = pawnPosition.getColumn();
 
-        if (findEnPassantMove(history, board, pawn_position) == null) {
+        if (findEnPassantMove(history, board, pawnPosition) == null) {
             return null;
-        } else if (findEnPassantMove(history, board, pawn_position) == Direction.UP_RIGHT) {
-            return new ChessMove(pawn_position, new ChessPosition(row - 1, col + 1), null);
-        } else if (findEnPassantMove(history, board, pawn_position) == Direction.UP_LEFT) {
-            return new ChessMove(pawn_position, new ChessPosition(row - 1, col - 1), null);
-        } else if (findEnPassantMove(history, board, pawn_position) == Direction.DOWN_RIGHT) {
-            return new ChessMove(pawn_position, new ChessPosition(row + 1, col + 1), null);
-        } else if (findEnPassantMove(history, board, pawn_position) == Direction.DOWN_LEFT) {
-            return new ChessMove(pawn_position, new ChessPosition(row + 1, col - 1), null);
+        } else if (findEnPassantMove(history, board, pawnPosition) == Direction.UP_RIGHT) {
+            return new ChessMove(pawnPosition, new ChessPosition(row - 1, col + 1), null);
+        } else if (findEnPassantMove(history, board, pawnPosition) == Direction.UP_LEFT) {
+            return new ChessMove(pawnPosition, new ChessPosition(row - 1, col - 1), null);
+        } else if (findEnPassantMove(history, board, pawnPosition) == Direction.DOWN_RIGHT) {
+            return new ChessMove(pawnPosition, new ChessPosition(row + 1, col + 1), null);
+        } else if (findEnPassantMove(history, board, pawnPosition) == Direction.DOWN_LEFT) {
+            return new ChessMove(pawnPosition, new ChessPosition(row + 1, col - 1), null);
         }
         return null;
     }
@@ -170,45 +174,52 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
      */
     private static PieceMovesCalculator.Direction findEnPassantMove(MoveHistory history, ChessBoard board, ChessPosition position) {
         // first see if the pawn to be moved is on the right rank for en passant
-        ChessGame.TeamColor this_team = board.getPiece(position).getTeamColor();
-        int pawn_row = position.getRow();
-        int pawn_col = position.getColumn();
+        ChessGame.TeamColor thisTeam = board.getPiece(position).getTeamColor();
+        int pawnRow = position.getRow();
+        int pawnCol = position.getColumn();
 
-        if (this_team == ChessGame.TeamColor.WHITE) {
-            if (pawn_row != 5) return null;
+        if (thisTeam == ChessGame.TeamColor.WHITE) {
+            if (pawnRow != 5) {
+                return null;
+            }
         } else { // if it's black to move
-            if (pawn_row != 4) return null;
+            if (pawnRow != 4) {
+                return null;
+            }
         }
 
         // next see if the last move was a pawn moving two squares forward
-        var last_move = history.getLastMove();
+        var lastMove = history.getLastMove();
 
-        ChessGame.TeamColor last_team;
-        if (this_team == ChessGame.TeamColor.WHITE) last_team = ChessGame.TeamColor.BLACK;
-        else last_team = ChessGame.TeamColor.WHITE;
+        ChessGame.TeamColor lastTeam;
+        if (thisTeam == ChessGame.TeamColor.WHITE) {
+            lastTeam = ChessGame.TeamColor.BLACK;
+        } else {
+            lastTeam = ChessGame.TeamColor.WHITE;
+        }
 
-        if (board.getPiece(last_move.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
-            if (last_team == ChessGame.TeamColor.WHITE
-                    && last_move.getStartPosition().getRow() == 2
-                    && last_move.getEndPosition().getRow() == 4) {
+        if (board.getPiece(lastMove.getEndPosition()).getPieceType() == ChessPiece.PieceType.PAWN) {
+            if (lastTeam == ChessGame.TeamColor.WHITE
+                    && lastMove.getStartPosition().getRow() == 2
+                    && lastMove.getEndPosition().getRow() == 4) {
 
                 // last, see if the pawn that moved is next to the current pawn
-                if (last_move.getEndPosition().getColumn() == pawn_col + 1) {
+                if (lastMove.getEndPosition().getColumn() == pawnCol + 1) {
                     return Direction.UP_RIGHT;
-                } else if (last_move.getEndPosition().getColumn() == pawn_col - 1) {
+                } else if (lastMove.getEndPosition().getColumn() == pawnCol - 1) {
                     return Direction.UP_LEFT;
                 } else {
                     return null;
                 }
             }
-            else if (last_team == ChessGame.TeamColor.BLACK
-                    && last_move.getStartPosition().getRow() == 7
-                    && last_move.getEndPosition().getRow() == 5) {
+            else if (lastTeam == ChessGame.TeamColor.BLACK
+                    && lastMove.getStartPosition().getRow() == 7
+                    && lastMove.getEndPosition().getRow() == 5) {
 
                 // last, see if the pawn that moved is next to the current pawn
-                if (last_move.getEndPosition().getColumn() == pawn_col + 1) {
+                if (lastMove.getEndPosition().getColumn() == pawnCol + 1) {
                     return Direction.DOWN_RIGHT;
-                } else if (last_move.getEndPosition().getColumn() == pawn_col - 1) {
+                } else if (lastMove.getEndPosition().getColumn() == pawnCol - 1) {
                     return Direction.DOWN_LEFT;
                 } else {
                     return null;

@@ -13,6 +13,5 @@ public interface GameDAO {
     void createNewGame(String gameName, int gameID);
     void updateGame(String username, String playerColor, Integer gameID);
 
-    void deleteGame(int gameID);
     void clearAllGames();
 }

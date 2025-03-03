@@ -23,11 +23,6 @@ public class MemUserDAO implements UserDAO {
     }
 
     @Override
-    public void deleteUser(String username) {
-        users.remove(username);
-    }
-
-    @Override
     public void clearAllUsers() {
         users.clear();
     }

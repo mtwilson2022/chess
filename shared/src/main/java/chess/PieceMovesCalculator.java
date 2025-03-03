@@ -35,4 +35,20 @@ public interface PieceMovesCalculator {
         return end.getRow() < 1 || end.getRow() > 8 || end.getColumn() < 1 || end.getColumn() > 8;
     }
 
+    default void addMove(ChessBoard board, ChessPosition position,
+                         ChessPosition newPosition, Collection<ChessMove> moves) {
+
+        ChessPiece movingPiece = board.getPiece(position);
+        var move = new ChessMove(position, newPosition, null);
+
+        // if the desired move is valid, add it to the moves list
+        if (!outOfBounds(move)) {
+            if (board.getPiece(newPosition) == null) {
+                moves.add(move);
+            } else if (board.getPiece(newPosition).getTeamColor() != movingPiece.getTeamColor()) {
+                moves.add(move);
+            }
+        }
+    }
+
 }

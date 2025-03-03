@@ -78,28 +78,28 @@ public class ChessBoard implements Cloneable {
      */
     private void addPieces(ChessGame.TeamColor color) {
         // get rows to add to
-        int back_row, pawn_row;
+        int backRow, pawnRow;
         if (color == ChessGame.TeamColor.WHITE) {
-            back_row = 1;
-            pawn_row = 2;
+            backRow = 1;
+            pawnRow = 2;
         } else { // if color == ChessGame.TeamColor.BLACK
-            back_row = 8;
-            pawn_row = 7;
+            backRow = 8;
+            pawnRow = 7;
         }
 
         // add the back row
-        addPiece(new ChessPosition(back_row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(back_row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(back_row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(back_row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(back_row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(back_row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(back_row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(back_row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(backRow, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(backRow, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(backRow, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(backRow, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(backRow, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(backRow, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(backRow, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(backRow, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
 
         // add the pawns
         for (int i = 1; i <= 8; i++) {
-            addPiece(new ChessPosition(pawn_row, i), new ChessPiece(color, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(pawnRow, i), new ChessPiece(color, ChessPiece.PieceType.PAWN));
         }
     }
 
@@ -107,7 +107,7 @@ public class ChessBoard implements Cloneable {
     public ChessBoard clone() {
         try {
             ChessBoard clone = (ChessBoard) super.clone();
-            ArrayList<ArrayList<ChessPiece>> copy_board = new ArrayList<>();
+            ArrayList<ArrayList<ChessPiece>> copyBoard = new ArrayList<>();
 
             for (int i = 1; i <= 8; i++) {
                 ArrayList<ChessPiece> row = new ArrayList<>();
@@ -120,10 +120,10 @@ public class ChessBoard implements Cloneable {
                         row.add(j-1, piece);
                     }
                 }
-                copy_board.add(i-1, row);
+                copyBoard.add(i-1, row);
             }
 
-            clone.board = copy_board;
+            clone.board = copyBoard;
             return clone;
 
         } catch (CloneNotSupportedException e) {

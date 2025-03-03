@@ -13,7 +13,7 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board;
-    private MoveHistory moveHistory;
+    private final MoveHistory moveHistory;
 
     public ChessGame() {
         // settings for starting a new game
@@ -60,26 +60,26 @@ public class ChessGame {
         if (piece == null) {
             return null;
         }
-        var all_moves = piece.pieceMoves(this.board, startPosition);
+        var allMoves = piece.pieceMoves(this.board, startPosition);
 
         // add any special moves that may apply (castling, en passant)
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            var en_passant_move = PawnMovesCalculator.addEnPassantMove(this.moveHistory, this.board, startPosition);
-            if (en_passant_move != null) {
-                all_moves.add(en_passant_move);
+            var enPassantMove = PawnMovesCalculator.addEnPassantMove(this.moveHistory, this.board, startPosition);
+            if (enPassantMove != null) {
+                allMoves.add(enPassantMove);
             }
         }
 
         // next, filter out the moves that end with the king in check
-        var legal_moves = new ArrayList<ChessMove>();
+        var legalMoves = new ArrayList<ChessMove>();
 
-        for (ChessMove move : all_moves) {
+        for (ChessMove move : allMoves) {
             if (isValidMove(move, piece.getTeamColor())) {
-                legal_moves.add(move);
+                legalMoves.add(move);
             }
         }
 
-        return legal_moves;
+        return legalMoves;
     }
 
     /**
@@ -90,17 +90,17 @@ public class ChessGame {
      */
     private boolean isValidMove(ChessMove move, TeamColor color) {
         // make a deep copy of the board, change the chess game's board to the copy
-        var game_board = getBoard();
-        var temp_board = game_board.clone();
-        setBoard(temp_board);
+        var gameBoard = getBoard();
+        var tempBoard = gameBoard.clone();
+        setBoard(tempBoard);
 
         // make the hypothetical move in the copied board
-        moveThePiece(move, temp_board);
+        moveThePiece(move, tempBoard);
 
         // after the move, see if the king is in check. Only if he isn't can the move be added
         // regardless, go back to the original board
         boolean valid = !isInCheck(color);
-        setBoard(game_board);
+        setBoard(gameBoard);
         return valid;
     }
 
@@ -121,11 +121,11 @@ public class ChessGame {
 
         // en passant
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            int end_col = move.getEndPosition().getColumn();
-            int start_col = move.getStartPosition().getColumn();
-            if (board.getPiece(move.getEndPosition()) == null && end_col != start_col) {
+            int endCol = move.getEndPosition().getColumn();
+            int startCol = move.getStartPosition().getColumn();
+            if (board.getPiece(move.getEndPosition()) == null && endCol != startCol) {
                 // en passant is occurring. There is a piece either to the left or right of the pawn
-                board.addPiece(new ChessPosition(move.getStartPosition().getRow(), end_col), null);
+                board.addPiece(new ChessPosition(move.getStartPosition().getRow(), endCol), null);
             }
         }
 
@@ -150,8 +150,8 @@ public class ChessGame {
         }
 
         // next make sure it's that piece's turn
-        var moving_color = this.board.getPiece(move.getStartPosition()).getTeamColor();
-        if (moving_color != this.teamTurn) {
+        var movingColor = this.board.getPiece(move.getStartPosition()).getTeamColor();
+        if (movingColor != this.teamTurn) {
             throw new InvalidMoveException();
         }
 
@@ -185,10 +185,13 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor enemyColor;
-        if (teamColor == TeamColor.WHITE) enemyColor = TeamColor.BLACK;
-        else enemyColor = TeamColor.WHITE;
+        if (teamColor == TeamColor.WHITE) {
+            enemyColor = TeamColor.BLACK;
+        } else {
+            enemyColor = TeamColor.WHITE;
+        }
 
-        var king_position = findKingPosition(this.board, teamColor);
+        var kingPosition = findKingPosition(this.board, teamColor);
 
         // for each square, if it contains an enemy piece, find that piece's possible moves
         for (int i = 1; i <= 8; i++) {
@@ -196,13 +199,23 @@ public class ChessGame {
                 var position = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(position);
 
-                if (piece != null) {
-                    if (piece.getTeamColor() == enemyColor) {
-                        var possible_moves = piece.pieceMoves(this.board, position);
-                        // if the king's square is in the moves list, it is in check
-                        for (ChessMove move : possible_moves) {
-                            if (move.getEndPosition().equals(king_position)) return true;
-                        }
+                if (pieceIsCheckingKing(piece, enemyColor, position, kingPosition)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean pieceIsCheckingKing(ChessPiece piece, TeamColor enemyColor,
+                                        ChessPosition piecePosition, ChessPosition kingPosition) {
+        if (piece != null) {
+            if (piece.getTeamColor() == enemyColor) {
+                var possibleMoves = piece.pieceMoves(this.board, piecePosition);
+                // if the king's square is in the moves list, it is in check
+                for (ChessMove move : possibleMoves) {
+                    if (move.getEndPosition().equals(kingPosition)) {
+                        return true;
                     }
                 }
             }
@@ -258,7 +271,7 @@ public class ChessGame {
      * @return a list of all moves that player could make
      */
     private Collection<ChessMove> allValidMoves(TeamColor color) {
-        var all_moves = new ArrayList<ChessMove>();
+        var allMoves = new ArrayList<ChessMove>();
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -267,14 +280,14 @@ public class ChessGame {
 
                 if (piece != null) {
                     if (piece.getTeamColor() == color) {
-                        var possible_moves = validMoves(position);
-                        all_moves.addAll(possible_moves);
+                        var possibleMoves = validMoves(position);
+                        allMoves.addAll(possibleMoves);
                     }
                 }
             }
         }
 
-        return all_moves;
+        return allMoves;
     }
 
     /**
@@ -294,13 +307,4 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return this.board;
     }
-
-    /**
-     * Gets all the in-game moves
-     * @return a deque of all the moves made in the game
-     */
-    public MoveHistory getMoveHistory() {
-        return this.moveHistory;
-    }
-
 }
