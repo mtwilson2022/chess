@@ -33,22 +33,26 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
 
             // set up the potential move
             numSquares++;
-            ChessPosition newPosition;
-            if (dir == Direction.UP_RIGHT) {
-                newPosition = new ChessPosition(currRow + numSquares, currCol + numSquares);
-            } else if (dir == Direction.DOWN_RIGHT) {
-                newPosition = new ChessPosition(currRow - numSquares, currCol + numSquares);
-            } else if (dir == Direction.UP_LEFT) {
-                newPosition = new ChessPosition(currRow + numSquares, currCol - numSquares);
-            } else { // if (dir == Direction.DOWN_LEFT)
-                newPosition = new ChessPosition(currRow - numSquares, currCol - numSquares);
-            }
+            ChessPosition newPosition = getPosition(dir, position, numSquares);
             var move = new ChessMove(position, newPosition, null);
 
             // check if it's a legal move
             canMove = addMoveIfLegal(move, board, moves, newPosition, movingPiece);
-
         }
+    }
 
+    private ChessPosition getPosition(Direction dir, ChessPosition position, int numSquares) {
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
+
+        if (dir == Direction.UP_RIGHT) {
+            return new ChessPosition(currRow + numSquares, currCol + numSquares);
+        } else if (dir == Direction.DOWN_RIGHT) {
+            return new ChessPosition(currRow - numSquares, currCol + numSquares);
+        } else if (dir == Direction.UP_LEFT) {
+            return new ChessPosition(currRow + numSquares, currCol - numSquares);
+        } else { // if (dir == Direction.DOWN_LEFT)
+            return new ChessPosition(currRow - numSquares, currCol - numSquares);
+        }
     }
 }
