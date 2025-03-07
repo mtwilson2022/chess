@@ -54,6 +54,5 @@ public class Server {
         res.type("application/json");
         res.status(500);
         res.body(body);
-//        return body;
     }
 }
