@@ -4,6 +4,10 @@ import model.AuthData;
 
 public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
 
+    public SqlAuthDAO() throws DataAccessException {
+        SqlDataAccess.createTable(TableType.AUTH);
+    }
+
     @Override
     public AuthData getAuth(String authToken) {
         return null;

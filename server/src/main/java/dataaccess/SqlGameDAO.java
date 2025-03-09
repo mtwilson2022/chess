@@ -7,6 +7,10 @@ import java.util.Set;
 
 public class SqlGameDAO extends SqlDataAccess implements GameDAO {
 
+    public SqlGameDAO() throws DataAccessException {
+        SqlDataAccess.createTable(TableType.GAME);
+    }
+
     @Override
     public GameData getGame(int gameID) {
         return null;
