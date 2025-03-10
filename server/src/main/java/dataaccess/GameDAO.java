@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 public interface GameDAO {
-    GameData getGame(int gameID);
-    List<GameData> listGames();
-    Set<Integer> getAllGameIDs();
+    GameData getGame(int gameID) throws DataAccessException;
+    List<GameData> listGames() throws DataAccessException;
+    Set<Integer> getAllGameIDs() throws DataAccessException;
 
-    void createNewGame(String gameName, int gameID);
-    void updateGame(String username, String playerColor, Integer gameID);
+    void createNewGame(String gameName, int gameID) throws DataAccessException;
+    void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException;
 
-    void clearAllGames();
+    void clearAllGames() throws DataAccessException;
 }
