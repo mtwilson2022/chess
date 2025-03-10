@@ -26,7 +26,11 @@ public class UserServiceTests {
 
         // add something to userDAO and authDAO
         this.registeredUser = new UserData("user1", "password", "email@example.com");
-        userDAO.insertUser(registeredUser);
+        try {
+            userDAO.insertUser(registeredUser);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -36,6 +40,8 @@ public class UserServiceTests {
             Assertions.assertNotNull(service.login(req));
         } catch (UnauthorizedException e) {
             Assertions.fail("Login should not have thrown an exception.");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -59,6 +65,8 @@ public class UserServiceTests {
             throw new RuntimeException("Invalid input");
         } catch (AlreadyTakenException ate) {
             throw new RuntimeException();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -72,7 +80,11 @@ public class UserServiceTests {
     public void successLogout() {
         String token = "some_token";
         var testAuthData = new AuthData(token, "user1");
-        authDAO.insertAuth(testAuthData);
+        try {
+            authDAO.insertAuth(testAuthData);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         var req = new LogoutRequest(token);
         Assertions.assertDoesNotThrow(() -> service.logout(req));

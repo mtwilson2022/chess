@@ -14,7 +14,7 @@ public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authToken, username FROM auth WHERE auth = ?"; // TODO: need to worry abt warning?
+            String statement = "SELECT authToken, username FROM auth WHERE auth = ?";
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
@@ -22,7 +22,7 @@ public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage()); // TODO: how far back should I throw stuff?
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -48,7 +48,7 @@ public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "DELETE FROM auth WHERE auth = ?";
             try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, authToken); // TODO: should use set method just for insert, or always?
+                preparedStatement.setString(1, authToken);
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
@@ -57,7 +57,7 @@ public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
     }
 
     @Override
-    public void clearAllAuths() throws DataAccessException { // TODO: why no negative test cases? how to handle exceptions?
+    public void clearAllAuths() throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "TRUNCATE TABLE auth";
             try (var preparedStatement = conn.prepareStatement(statement)) {

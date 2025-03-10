@@ -1,11 +1,8 @@
 package service;
 
-import dataaccess.AlreadyTakenException;
-import dataaccess.UnauthorizedException;
+import dataaccess.*;
 import request.*;
 import response.*;
-import dataaccess.AuthDAO;
-import dataaccess.UserDAO;
 import model.*;
 import java.util.UUID;
 
@@ -19,7 +16,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public LoginResponse login(LoginRequest req) throws UnauthorizedException {
+    public LoginResponse login(LoginRequest req) throws DataAccessException {
         UserData user = userDAO.getUser(req.username());
 
         if (user == null) {
@@ -35,7 +32,7 @@ public class UserService {
         return new LoginResponse(user.username(), token);
     }
 
-    public RegisterResponse register(RegisterRequest req) throws AlreadyTakenException, BadRequestException {
+    public RegisterResponse register(RegisterRequest req) throws DataAccessException, BadRequestException {
         // verify the input is correct
         if (req.username() == null || req.password() == null || req.email() == null) {
             throw new BadRequestException("Error: bad request");
@@ -56,7 +53,7 @@ public class UserService {
         return new RegisterResponse(newUser.username(), token);
     }
 
-    public LogoutResponse logout(LogoutRequest req) throws UnauthorizedException {
+    public LogoutResponse logout(LogoutRequest req) throws DataAccessException {
         var token = req.authToken();
 
         if (authDAO.getAuth(token) == null) {

@@ -1,6 +1,7 @@
 package handler;
 
 import dataaccess.AlreadyTakenException;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import response.LoginResponse;
 import response.LogoutResponse;
@@ -22,7 +23,7 @@ public class UserHandler extends HttpHandler {
         this.gson = new Gson();
     }
 
-    public Object register(Request req, Response res) {
+    public Object register(Request req, Response res) throws DataAccessException {
         RegisterRequest registerReq = gson.fromJson(req.body(), RegisterRequest.class);
         try {
             RegisterResponse registerRes = service.register(registerReq);
@@ -38,7 +39,7 @@ public class UserHandler extends HttpHandler {
         }
     }
 
-    public Object login(Request req, Response res) {
+    public Object login(Request req, Response res) throws DataAccessException {
         LoginRequest loginReq = gson.fromJson(req.body(), LoginRequest.class);
         try {
             LoginResponse loginRes = service.login(loginReq);
@@ -50,7 +51,7 @@ public class UserHandler extends HttpHandler {
         }
     }
 
-    public Object logout(Request req, Response res) {
+    public Object logout(Request req, Response res) throws DataAccessException {
         String token = req.headers("Authorization");
         var logoutReq = new LogoutRequest(token);
         try {
