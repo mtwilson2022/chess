@@ -21,21 +21,25 @@ public class GameServiceTests {
 
     @BeforeEach
     public void setUp() {
-        this.gameDAO = new MemGameDAO();
-        this.authDAO = new MemAuthDAO();
-        this.service = new GameService(gameDAO, authDAO);
+        try {
+            this.gameDAO = new MemGameDAO();
+            this.authDAO = new MemAuthDAO();
+            this.service = new GameService(gameDAO, authDAO);
 
-        gameDAO.createNewGame("game1", 1111);
-        gameDAO.updateGame("Spiderman", "WHITE", 1111);
-        gameDAO.updateGame("JJ Jamison", "BLACK", 1111);
+            gameDAO.createNewGame("game1", 1111);
+            gameDAO.updateGame("Spiderman", "WHITE", 1111);
+            gameDAO.updateGame("JJ Jamison", "BLACK", 1111);
 
-        gameDAO.createNewGame("game2", 2222);
-        gameDAO.updateGame("Billy the Kid", "WHITE", 2222);
+            gameDAO.createNewGame("game2", 2222);
+            gameDAO.updateGame("Billy the Kid", "WHITE", 2222);
 
-        gameDAO.createNewGame("game3", 3333);
+            gameDAO.createNewGame("game3", 3333);
 
-        validAuth = UUID.randomUUID().toString();
-        authDAO.insertAuth(new AuthData(validAuth, "Spiderman"));
+            validAuth = UUID.randomUUID().toString();
+            authDAO.insertAuth(new AuthData(validAuth, "Spiderman"));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Test
@@ -44,7 +48,7 @@ public class GameServiceTests {
         try {
             var games = service.listGames(req);
             Assertions.assertEquals(3, games.games().size());
-        } catch (UnauthorizedException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,7 +66,7 @@ public class GameServiceTests {
             var res = service.createGame(req);
             Assertions.assertEquals(4, gameDAO.listGames().size());
             Assertions.assertInstanceOf(Integer.class, res.gameID());
-        } catch (BadRequestException | UnauthorizedException e) {
+        } catch (BadRequestException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -87,7 +91,7 @@ public class GameServiceTests {
             service.joinGame(req2);
             Assertions.assertEquals("Spiderman", gameDAO.getGame(3333).whiteUsername());
             Assertions.assertNull(gameDAO.getGame(3333).blackUsername());
-        } catch (BadRequestException | UnauthorizedException | AlreadyTakenException e) {
+        } catch (BadRequestException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }

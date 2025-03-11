@@ -1,6 +1,7 @@
 package handler;
 
 import dataaccess.AlreadyTakenException;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import response.CreateGameResponse;
 import response.JoinGameResponse;
@@ -21,7 +22,7 @@ public class GameHandler extends HttpHandler {
         this.gson = new Gson();
     }
 
-    public Object listGames(Request req, Response res) {
+    public Object listGames(Request req, Response res) throws DataAccessException {
         String token = req.headers("Authorization");
         var listGamesReq = new ListGamesRequest(token);
         try {
@@ -40,7 +41,7 @@ public class GameHandler extends HttpHandler {
 //
 //    }
 
-    public Object createGame(Request req, Response res) {
+    public Object createGame(Request req, Response res) throws DataAccessException {
         var initialReq = gson.fromJson(req.body(), CreateGameRequest.class);
         String token = req.headers("Authorization");
         CreateGameRequest createGameReq = initialReq.setAuthToken(token);
@@ -59,7 +60,7 @@ public class GameHandler extends HttpHandler {
         }
     }
 
-    public Object joinGame(Request req, Response res) {
+    public Object joinGame(Request req, Response res) throws DataAccessException {
         var initialReq = gson.fromJson(req.body(), JoinGameRequest.class);
         String token = req.headers("Authorization");
         JoinGameRequest joinGameReq = initialReq.setAuthToken(token);

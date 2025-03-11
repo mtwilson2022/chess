@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import request.ClearRequest;
 import response.ClearResponse;
 import service.ClearService;
@@ -16,7 +17,7 @@ public class ClearHandler extends HttpHandler {
         this.gson = new Gson();
     }
 
-    public Object clear(Request req, Response res) {
+    public Object clear(Request req, Response res) throws DataAccessException {
         ClearRequest clearReq = gson.fromJson(req.body(), ClearRequest.class);
         ClearResponse clearRes = service.clear(clearReq);
         return sendSuccessfulResponse(clearRes, res, gson);

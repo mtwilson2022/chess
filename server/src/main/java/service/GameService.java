@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AlreadyTakenException;
-import dataaccess.UnauthorizedException;
-import dataaccess.GameDAO;
-import dataaccess.AuthDAO;
+import dataaccess.*;
 import response.*;
 import request.*;
 import model.*;
@@ -22,7 +19,7 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public ListGamesResponse listGames(ListGamesRequest req) throws UnauthorizedException {
+    public ListGamesResponse listGames(ListGamesRequest req) throws DataAccessException {
         var auth = authDAO.getAuth(req.authToken());
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
@@ -32,7 +29,7 @@ public class GameService {
         return new ListGamesResponse(games);
     }
 
-    public CreateGameResponse createGame(CreateGameRequest req) throws UnauthorizedException, BadRequestException {
+    public CreateGameResponse createGame(CreateGameRequest req) throws DataAccessException, BadRequestException {
         if (req.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -49,7 +46,7 @@ public class GameService {
         return new CreateGameResponse(gameID);
     }
 
-    public JoinGameResponse joinGame(JoinGameRequest req) throws UnauthorizedException, BadRequestException, AlreadyTakenException {
+    public JoinGameResponse joinGame(JoinGameRequest req) throws DataAccessException, BadRequestException {
         // bad request if invalid team color (e.g. "GREEN" or null) or nonexistent gameID entered
         if (req.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
