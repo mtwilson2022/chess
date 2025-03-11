@@ -20,7 +20,7 @@ public class SqlUserDAO extends SqlDataAccess implements UserDAO {
 
                 try (var rs = preparedStatement.executeQuery()) {
                     var un = rs.getString("username");
-                    var pw = rs.getString("password");
+                    var pw = rs.getString("password"); // TODO: hash it!!
                     var email = rs.getString("email");
                     return new UserData(un, pw, email);
                 }
