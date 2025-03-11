@@ -17,6 +17,11 @@ public class AuthDAOTests {
 
     }
 
+    @AfterEach
+    public void removeTables() {
+
+    }
+
     @Test
     public void successGetAuth() {
 

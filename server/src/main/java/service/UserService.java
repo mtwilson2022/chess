@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import request.*;
 import response.*;
 import model.*;
@@ -21,7 +22,9 @@ public class UserService {
 
         if (user == null) {
             throw new UnauthorizedException("Error: unauthorized");
-        } else if (!user.password().equals(req.password())) {
+//        } else if (!user.password().equals(req.password())) {
+//            throw new UnauthorizedException("Error: unauthorized");
+        } else if (!BCrypt.checkpw(req.password(), user.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 

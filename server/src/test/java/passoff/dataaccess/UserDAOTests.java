@@ -17,6 +17,11 @@ public class UserDAOTests {
 
     }
 
+    @AfterEach
+    public void removeTables() {
+
+    }
+
     @Test
     public void successGetUser() {
 

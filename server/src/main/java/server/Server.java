@@ -15,13 +15,18 @@ public class Server {
     private final GameHandler gameHandler;
 
     public Server() {
-        var userDAO = new MemUserDAO();
-        var authDAO = new MemAuthDAO();
-        var gameDAO = new MemGameDAO();
+        try { // change from Phase 3: try/catch block and SqlDAOs instead of MemDAOs
+            var userDAO = new SqlUserDAO();
+            var authDAO = new SqlAuthDAO();
+            var gameDAO = new SqlGameDAO();
 
-        clearHandler = new ClearHandler(new ClearService(userDAO, gameDAO, authDAO));
-        userHandler = new UserHandler(new UserService(userDAO, authDAO));
-        gameHandler = new GameHandler(new GameService(gameDAO, authDAO));
+            clearHandler = new ClearHandler(new ClearService(userDAO, gameDAO, authDAO));
+            userHandler = new UserHandler(new UserService(userDAO, authDAO));
+            gameHandler = new GameHandler(new GameService(gameDAO, authDAO));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public int run(int desiredPort) {
