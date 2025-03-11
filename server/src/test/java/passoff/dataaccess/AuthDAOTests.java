@@ -25,6 +25,15 @@ public class AuthDAOTests {
     @BeforeEach
     public void configureTables() {
         try {
+            try (Connection conn = DatabaseManager.getConnection()) {
+                String statement = "DROP TABLE IF EXISTS auth";
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            } catch (SQLException | DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+
             authDAO = new SqlAuthDAO();
 
             try (Connection conn = DatabaseManager.getConnection()) {
@@ -59,15 +68,15 @@ public class AuthDAOTests {
         try {
             AuthData auth1 = authDAO.getAuth("example-auth");
             AuthData expected1 = new AuthData("example-auth", "user1");
-            Assertions.assertEquals(auth1.username(), expected1.username());
+            Assertions.assertEquals(expected1.username(), auth1.username());
 
             // make sure user1 is still authorized in the DB
             AuthData auth2 = authDAO.getAuth("example-auth");
-            Assertions.assertEquals(auth2, expected1);
+            Assertions.assertEquals(expected1, auth2);
 
             AuthData auth3 = authDAO.getAuth("other-auth");
             AuthData expected3 = new AuthData("other-auth", "user2");
-            Assertions.assertEquals(auth3, expected3);
+            Assertions.assertEquals(expected3, auth3);
 
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -76,18 +85,59 @@ public class AuthDAOTests {
 
     @Test
     public void failGetAuth() {
-        // invalid auth token returns null, or change service classes to allow any sql exceptions?
+        // invalid auth token returns null
+        String badToken = "this is not a good auth.";
+        try {
+            AuthData auth = authDAO.getAuth(badToken);
+            Assertions.assertNull(auth);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void successInsertAuth() {
-        // pretty simple. just do it
+        // insert a new auth
+        try {
+            AuthData newAuth = new AuthData("new-auth", "new-user");
+            authDAO.insertAuth(newAuth);
+
+            Assertions.assertEquals(newAuth, authDAO.getAuth("new-auth"));
+            Assertions.assertEquals(3, authCount());
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int authCount() throws DataAccessException {
+        int numAuths = 0;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken, username FROM auth";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        numAuths++;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        return numAuths;
     }
 
     @Test
     public void failInsertAuth() {
-        // try to insert an auth that already exists maybe?
-        // should replace the auth for someone that already has an auth
+        // try to insert an auth that already exists
+        AuthData existingAuth = new AuthData("example-auth", "new-user");
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.insertAuth(existingAuth));
+
+        try {
+            Assertions.assertEquals(2, authCount());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
