@@ -46,7 +46,8 @@ public class UserService {
             throw new AlreadyTakenException("Error: already taken");
         }
 
-        var newUser = new UserData(req.username(), req.password(), req.email());
+        var hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt());
+        var newUser = new UserData(req.username(), hashedPassword, req.email());
         userDAO.insertUser(newUser);
 
         var token = UUID.randomUUID().toString();

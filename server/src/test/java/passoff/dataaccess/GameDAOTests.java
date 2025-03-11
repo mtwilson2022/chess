@@ -8,10 +8,6 @@ public class GameDAOTests {
 
     // instance vars
 
-    @BeforeAll
-    public static void configureDB() {
-
-    }
 
     @BeforeEach
     public void configureTables() {

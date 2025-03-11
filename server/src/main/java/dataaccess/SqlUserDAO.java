@@ -20,15 +20,18 @@ public class SqlUserDAO extends SqlDataAccess implements UserDAO {
                 preparedStatement.setString(1, username);
 
                 try (var rs = preparedStatement.executeQuery()) {
-                    var un = rs.getString("username");
-                    var pw = rs.getString("password");
-                    var email = rs.getString("email");
-                    return new UserData(un, pw, email);
+                    if (rs.next()) {
+                        var un = rs.getString("username");
+                        var pw = rs.getString("password");
+                        var email = rs.getString("email");
+                        return new UserData(un, pw, email);
+                    }
                 }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
+        return null;
     }
 
     @Override
@@ -37,8 +40,7 @@ public class SqlUserDAO extends SqlDataAccess implements UserDAO {
             String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, user.username());
-                var hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-                preparedStatement.setString(2, hashedPassword);
+                preparedStatement.setString(2, user.password());
                 preparedStatement.setString(3, user.email());
                 preparedStatement.executeUpdate();
             }

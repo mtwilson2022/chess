@@ -5,22 +5,14 @@ import dataaccess.DatabaseManager;
 import dataaccess.SqlAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.*;
-import passoff.model.*;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class AuthDAOTests {
 
     // instance vars
     private SqlAuthDAO authDAO;
-
-    @BeforeAll
-    public static void configureDB() {
-
-    }
 
     @BeforeEach
     public void configureTables() {
@@ -110,7 +102,7 @@ public class AuthDAOTests {
         }
     }
 
-    private int authCount() throws DataAccessException {
+    private static int authCount() throws DataAccessException {
         int numAuths = 0;
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT authToken, username FROM auth";
@@ -142,18 +134,44 @@ public class AuthDAOTests {
 
     @Test
     public void successDeleteAuth() {
-        // validate an authtoken, then remove it, then make sure it's gone. Check both authToken and username
-        // check for reduced size of tables
+        // remove an authToken, then make sure it's gone. Check both authToken and username
+        try {
+            authDAO.deleteAuth("example-auth");
+            Assertions.assertNull(authDAO.getAuth("example-auth"));
+
+            try (Connection conn = DatabaseManager.getConnection()) {
+                String statement = "SELECT username FROM auth WHERE username = 'user1'";
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    try (var rs = preparedStatement.executeQuery()) {
+                        Assertions.assertFalse(rs.next());
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+            // check for reduced size of tables
+            Assertions.assertEquals(1, authCount());
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void failDeleteAuth() {
         // try to delete an auth that doesn't exist
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.deleteAuth("not-an-auth"));
     }
 
     @Test
     public void successClearAuths() {
-        // get auths, clear them, try to get them
-        // check that the table is cleared but still exists
+        try {
+            Assertions.assertEquals(2, authCount());
+            authDAO.clearAllAuths();
+            Assertions.assertEquals(0, authCount());
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
