@@ -6,7 +6,6 @@ import model.GameData;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
