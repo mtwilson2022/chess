@@ -1,8 +1,5 @@
-package passoff.dataaccess;
+package dataaccess;
 
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.SqlAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 
@@ -167,6 +164,14 @@ public class AuthDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+
+        // mess up the table
+        try {
+            messUpTable();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.deleteAuth("string too long now"));
     }
 
     @Test
@@ -178,6 +183,22 @@ public class AuthDAOTests {
 
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void messUpTable() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "DROP TABLE auth";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            String stmt = "CREATE TABLE auth (token VARCHAR(1) NOT NULL, PRIMARY KEY (token) )";
+            try (var preparedStatement = conn.prepareStatement(stmt)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

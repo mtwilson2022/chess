@@ -1,10 +1,7 @@
-package passoff.dataaccess;
+package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.SqlGameDAO;
 import model.GameData;
 import org.junit.jupiter.api.*;
 
@@ -115,17 +112,9 @@ public class GameDAOTests {
 
     @Test
     public void failListGames() {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "DROP TABLE game";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
-            }
-
-            String stmt = "CREATE TABLE game (id INT NOT NULL, PRIMARY KEY (id) )";
-            try (var preparedStatement = conn.prepareStatement(stmt)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException | DataAccessException e) {
+        try {
+            messUpTable();
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -146,17 +135,9 @@ public class GameDAOTests {
 
     @Test
     public void failGetAllIDs() {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "DROP TABLE game";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
-            }
-
-            String stmt = "CREATE TABLE game (id INT NOT NULL, PRIMARY KEY (id) )";
-            try (var preparedStatement = conn.prepareStatement(stmt)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException | DataAccessException e) {
+        try {
+            messUpTable();
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -204,6 +185,13 @@ public class GameDAOTests {
         // tries to update a nonexistent game. Nothing new should be created.
         Assertions.assertDoesNotThrow(() -> gameDAO.updateGame("user1", "white", 1001));
         Assertions.assertThrows(DataAccessException.class, () -> gameDAO.getGame(1001));
+
+        try {
+            messUpTable();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.updateGame("user1", "white", 1001));
     }
 
     @Test
@@ -214,6 +202,23 @@ public class GameDAOTests {
             Assertions.assertEquals(0, gameDAO.getAllGameIDs().size());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    private static void messUpTable() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "DROP TABLE game";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+
+            String stmt = "CREATE TABLE game (id INT NOT NULL, PRIMARY KEY (id) )";
+            try (var preparedStatement = conn.prepareStatement(stmt)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 }

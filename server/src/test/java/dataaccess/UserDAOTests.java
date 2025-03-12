@@ -1,8 +1,5 @@
-package passoff.dataaccess;
+package dataaccess;
 
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseManager;
-import dataaccess.SqlUserDAO;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
