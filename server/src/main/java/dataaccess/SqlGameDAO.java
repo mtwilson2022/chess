@@ -26,17 +26,22 @@ public class SqlGameDAO extends SqlDataAccess implements GameDAO {
                 preparedStatement.setInt(1, gameID);
 
                 try (var rs = preparedStatement.executeQuery()) {
-                    var id = rs.getInt("gameId");
-                    var wun = rs.getString("whiteUsername");
-                    var bun = rs.getString("blackUsername");
-                    var name = rs.getString("gameName");
+                    if (rs.next()) {
+                        var id = rs.getInt("gameId");
+                        var wun = rs.getString("whiteUsername");
+                        var bun = rs.getString("blackUsername");
+                        var name = rs.getString("gameName");
 
-                    // get the json string representing the chess game and deserialize it
-                    var json = rs.getString("gameJson");
-                    var gson = new Gson();
-                    var game = gson.fromJson(json, ChessGame.class);
+                        // get the json string representing the chess game and deserialize it
+                        var json = rs.getString("gameJson");
+                        var gson = new Gson();
+                        var game = gson.fromJson(json, ChessGame.class);
 
-                    return new GameData(id, wun, bun, name, game);
+                        return new GameData(id, wun, bun, name, game);
+                    }
+                    else {
+                        throw new DataAccessException("Nonexistent gameID");
+                    }
                 }
             }
         } catch (SQLException e) {
