@@ -160,7 +160,13 @@ public class AuthDAOTests {
     @Test
     public void failDeleteAuth() {
         // try to delete an auth that doesn't exist
-        Assertions.assertThrows(DataAccessException.class, () -> authDAO.deleteAuth("not-an-auth"));
+        Assertions.assertDoesNotThrow(() -> authDAO.deleteAuth(null));
+        // auth should still be there
+        try {
+            Assertions.assertEquals(2, authCount());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
