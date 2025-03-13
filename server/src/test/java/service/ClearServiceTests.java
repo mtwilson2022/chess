@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import dataaccess.*;
 import model.*;
-import request.*;
-import response.ClearResponse;
+import request.ClearRequest;
+import result.ClearResult;
 
 public class ClearServiceTests {
     UserDAO userDAO;
@@ -36,7 +36,7 @@ public class ClearServiceTests {
     @Test
     public void testClear() {
         try {
-            Assertions.assertInstanceOf(ClearResponse.class, service.clear(new ClearRequest()));
+            Assertions.assertInstanceOf(ClearResult.class, service.clear(new ClearRequest()));
             Assertions.assertEquals(0, gameDAO.listGames().size());
             Assertions.assertNull(userDAO.getUser("user1"));
         } catch (DataAccessException e) {

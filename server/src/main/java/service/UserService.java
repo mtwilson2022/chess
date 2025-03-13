@@ -2,10 +2,10 @@ package service;
 
 import dataaccess.*;
 import org.mindrot.jbcrypt.BCrypt;
-import request.*;
-import response.*;
 import model.*;
 import java.util.UUID;
+import request.*;
+import result.*;
 
 public class UserService {
 
@@ -17,13 +17,11 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public LoginResponse login(LoginRequest req) throws DataAccessException {
+    public LoginResult login(LoginRequest req) throws DataAccessException {
         UserData user = userDAO.getUser(req.username());
 
         if (user == null) {
             throw new UnauthorizedException("Error: unauthorized");
-//        } else if (!user.password().equals(req.password())) {
-//            throw new UnauthorizedException("Error: unauthorized");
         } else if (!BCrypt.checkpw(req.password(), user.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
@@ -32,10 +30,10 @@ public class UserService {
         var auth = new AuthData(token, user.username());
         authDAO.insertAuth(auth);
 
-        return new LoginResponse(user.username(), token);
+        return new LoginResult(user.username(), token);
     }
 
-    public RegisterResponse register(RegisterRequest req) throws DataAccessException, BadRequestException {
+    public RegisterResult register(RegisterRequest req) throws DataAccessException, BadRequestException {
         // verify the input is correct
         if (req.username() == null || req.password() == null || req.email() == null) {
             throw new BadRequestException("Error: bad request");
@@ -54,10 +52,10 @@ public class UserService {
         var newAuth = new AuthData(token, newUser.username());
         authDAO.insertAuth(newAuth);
 
-        return new RegisterResponse(newUser.username(), token);
+        return new RegisterResult(newUser.username(), token);
     }
 
-    public LogoutResponse logout(LogoutRequest req) throws DataAccessException {
+    public LogoutResult logout(LogoutRequest req) throws DataAccessException {
         var token = req.authToken();
 
         if (authDAO.getAuth(token) == null) {
@@ -66,7 +64,7 @@ public class UserService {
 
         authDAO.deleteAuth(token);
 
-        return new LogoutResponse();
+        return new LogoutResult();
     }
 
 }

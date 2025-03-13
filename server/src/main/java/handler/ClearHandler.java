@@ -2,7 +2,7 @@ package handler;
 
 import dataaccess.DataAccessException;
 import request.ClearRequest;
-import response.ClearResponse;
+import result.ClearResult;
 import service.ClearService;
 import spark.Request;
 import spark.Response;
@@ -19,7 +19,7 @@ public class ClearHandler extends HttpHandler {
 
     public Object clear(Request req, Response res) throws DataAccessException {
         ClearRequest clearReq = gson.fromJson(req.body(), ClearRequest.class);
-        ClearResponse clearRes = service.clear(clearReq);
+        ClearResult clearRes = service.clear(clearReq);
         return sendSuccessfulResponse(clearRes, res, gson);
     }
 }

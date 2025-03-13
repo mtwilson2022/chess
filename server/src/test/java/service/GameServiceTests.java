@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import dataaccess.*;
 
 import model.AuthData;
-
 import request.*;
 
 import java.util.UUID;

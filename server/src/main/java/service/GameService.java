@@ -1,10 +1,9 @@
 package service;
 
 import dataaccess.*;
-import response.*;
-import request.*;
 import model.*;
-
+import request.*;
+import result.*;
 import java.util.List;
 import java.util.Random;
 
@@ -19,17 +18,17 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public ListGamesResponse listGames(ListGamesRequest req) throws DataAccessException {
+    public ListGamesResult listGames(ListGamesRequest req) throws DataAccessException {
         var auth = authDAO.getAuth(req.authToken());
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
         List<GameData> games = gameDAO.listGames();
-        return new ListGamesResponse(games);
+        return new ListGamesResult(games);
     }
 
-    public CreateGameResponse createGame(CreateGameRequest req) throws DataAccessException, BadRequestException {
+    public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException, BadRequestException {
         if (req.gameName() == null) {
             throw new BadRequestException("Error: bad request");
         }
@@ -43,10 +42,10 @@ public class GameService {
         var rand = new Random();
         var gameID = rand.nextInt(1000, 10000);
         gameDAO.createNewGame(gameName, gameID);
-        return new CreateGameResponse(gameID);
+        return new CreateGameResult(gameID);
     }
 
-    public JoinGameResponse joinGame(JoinGameRequest req) throws DataAccessException, BadRequestException {
+    public JoinGameResult joinGame(JoinGameRequest req) throws DataAccessException, BadRequestException {
         // bad request if invalid team color (e.g. "GREEN" or null) or nonexistent gameID entered
         if (req.playerColor() == null) {
             throw new BadRequestException("Error: bad request");
@@ -76,7 +75,7 @@ public class GameService {
         }
 
         gameDAO.updateGame(username, req.playerColor(), req.gameID());
-        return new JoinGameResponse();
+        return new JoinGameResult();
     }
 
 }

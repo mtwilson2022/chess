@@ -3,9 +3,9 @@ package handler;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
-import response.LoginResponse;
-import response.LogoutResponse;
-import response.RegisterResponse;
+import result.LoginResult;
+import result.LogoutResult;
+import result.RegisterResult;
 import service.BadRequestException;
 import service.UserService;
 import spark.Request;
@@ -26,7 +26,7 @@ public class UserHandler extends HttpHandler {
     public Object register(Request req, Response res) throws DataAccessException {
         RegisterRequest registerReq = gson.fromJson(req.body(), RegisterRequest.class);
         try {
-            RegisterResponse registerRes = service.register(registerReq);
+            RegisterResult registerRes = service.register(registerReq);
             return sendSuccessfulResponse(registerRes, res, gson);
 
         } catch (AlreadyTakenException ate) {
@@ -42,7 +42,7 @@ public class UserHandler extends HttpHandler {
     public Object login(Request req, Response res) throws DataAccessException {
         LoginRequest loginReq = gson.fromJson(req.body(), LoginRequest.class);
         try {
-            LoginResponse loginRes = service.login(loginReq);
+            LoginResult loginRes = service.login(loginReq);
             return sendSuccessfulResponse(loginRes, res, gson);
 
         } catch (UnauthorizedException ue) {
@@ -55,7 +55,7 @@ public class UserHandler extends HttpHandler {
         String token = req.headers("Authorization");
         var logoutReq = new LogoutRequest(token);
         try {
-            LogoutResponse logoutRes = service.logout(logoutReq);
+            LogoutResult logoutRes = service.logout(logoutReq);
             return sendSuccessfulResponse(logoutRes, res, gson);
 
         } catch (UnauthorizedException ue) {

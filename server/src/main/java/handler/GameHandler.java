@@ -3,9 +3,9 @@ package handler;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
-import response.CreateGameResponse;
-import response.JoinGameResponse;
-import response.ListGamesResponse;
+import result.CreateGameResult;
+import result.JoinGameResult;
+import result.ListGamesResult;
 import service.BadRequestException;
 import service.GameService;
 import spark.Request;
@@ -26,7 +26,7 @@ public class GameHandler extends HttpHandler {
         String token = req.headers("Authorization");
         var listGamesReq = new ListGamesRequest(token);
         try {
-            ListGamesResponse listGamesRes = service.listGames(listGamesReq);
+            ListGamesResult listGamesRes = service.listGames(listGamesReq);
             return sendSuccessfulResponse(listGamesRes, res, gson);
 
         } catch (UnauthorizedException ue) {
@@ -35,19 +35,13 @@ public class GameHandler extends HttpHandler {
         }
     }
 
-    // need to make complex type adapter thingy?
-//    private static Gson listGameSerializer() {
-//        GsonBuilder builder = new GsonBuilder();
-//
-//    }
-
     public Object createGame(Request req, Response res) throws DataAccessException {
         var initialReq = gson.fromJson(req.body(), CreateGameRequest.class);
         String token = req.headers("Authorization");
         CreateGameRequest createGameReq = initialReq.setAuthToken(token);
 
         try {
-            CreateGameResponse createGameRes = service.createGame(createGameReq);
+            CreateGameResult createGameRes = service.createGame(createGameReq);
             return sendSuccessfulResponse(createGameRes, res, gson);
 
         } catch (UnauthorizedException ue) {
@@ -66,7 +60,7 @@ public class GameHandler extends HttpHandler {
         JoinGameRequest joinGameReq = initialReq.setAuthToken(token);
 
         try {
-            JoinGameResponse joinGameRes = service.joinGame(joinGameReq);
+            JoinGameResult joinGameRes = service.joinGame(joinGameReq);
             return sendSuccessfulResponse(joinGameRes, res, gson);
 
         } catch (UnauthorizedException ue) {

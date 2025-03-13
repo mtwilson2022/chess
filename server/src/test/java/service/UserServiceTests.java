@@ -5,11 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dataaccess.*;
-
+import request.*;
 import model.AuthData;
 import model.UserData;
-
-import request.*;
 
 public class UserServiceTests {
 
