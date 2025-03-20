@@ -103,6 +103,10 @@ public class ChessBoard implements Cloneable {
         }
     }
 
+    public ArrayList<ArrayList<ChessPiece>> getBoardAsGrid() {
+        return this.board;
+    }
+
     @Override
     public ChessBoard clone() {
         try {
