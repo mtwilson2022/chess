@@ -24,10 +24,12 @@ public class ChessBoardPrinter {
 
         var b = boardGenerator(board);
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        printLabelRow(out, ChessGame.TeamColor.WHITE);
         printRowOfSquares(out, 0, b, ChessGame.TeamColor.WHITE);
         printRowOfSquares(out, 0, b, ChessGame.TeamColor.BLACK);
         printRowOfSquares(out, 7, b, ChessGame.TeamColor.WHITE);
         printRowOfSquares(out, 7, b, ChessGame.TeamColor.BLACK);
+        printLabelRow(out, ChessGame.TeamColor.BLACK);
     }
 
     public static void printBoardForWhite(PrintStream out) {
@@ -38,11 +40,39 @@ public class ChessBoardPrinter {
 
     }
 
+    private static void printLabelRow(PrintStream out, ChessGame.TeamColor color) {
+        String[] headers = {" A\u2003", " B\u2003", " C\u2003", " D\u2003", " E\u2003", " F\u2003", " G\u2003", " H\u2003"};
+
+        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_TEXT_COLOR_WHITE);
+        out.print("   ");
+
+        // for black, the headers need to be printed in reverse order
+        if (color == ChessGame.TeamColor.WHITE) {
+            for (String header : headers) {
+                out.print(header);
+            }
+        } else {
+            String[] headersReversed = new String[8];
+            for (int i = 0; i < 8; i++) {
+                headersReversed[i] = headers[7-i];
+            }
+            for (String header : headersReversed) {
+                out.print(header);
+            }
+        }
+
+        out.print("   ");
+        out.print(SET_BG_COLOR_BLACK);
+        out.println();
+    }
+
     private static void printRowOfSquares(PrintStream out, int row, String[][] board, ChessGame.TeamColor color) {
-        out.print(SET_TEXT_COLOR_BLACK);
+        printRowNumber(out, row);
 
         String[] boardRow = board[row];
 
+        // columns need to be printed in same order for the white player, reverse order for the black player
         if (color == ChessGame.TeamColor.WHITE) {
             for (int col = 0; col < 8; col++) {
                 String squareColor;
@@ -65,8 +95,17 @@ public class ChessBoardPrinter {
             }
         }
 
+        printRowNumber(out, row);
+
         out.print(SET_BG_COLOR_BLACK);
         out.println();
+    }
+
+    private static void printRowNumber(PrintStream out, int row) {
+        int num = row + 1; // change to 1-based indexing to match chess board conventions
+        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(" " + num + " ");
     }
 
     private static String[][] boardGenerator(ChessBoard chessBoard) {
