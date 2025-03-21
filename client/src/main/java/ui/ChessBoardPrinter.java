@@ -4,6 +4,9 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
 import static ui.EscapeSequences.*;
 
 public class ChessBoardPrinter {
@@ -18,14 +21,52 @@ public class ChessBoardPrinter {
             }
             System.out.println();
         }
+
+        var b = boardGenerator(board);
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        printRowOfSquares(out, 0, b, ChessGame.TeamColor.WHITE);
+        printRowOfSquares(out, 0, b, ChessGame.TeamColor.BLACK);
+        printRowOfSquares(out, 7, b, ChessGame.TeamColor.WHITE);
+        printRowOfSquares(out, 7, b, ChessGame.TeamColor.BLACK);
     }
 
-    public void printBoardForWhite() {
+    public static void printBoardForWhite(PrintStream out) {
 
     }
 
-    public void printBoardForBlack() {
+    public static void printBoardForBlack(PrintStream out) {
 
+    }
+
+    private static void printRowOfSquares(PrintStream out, int row, String[][] board, ChessGame.TeamColor color) {
+        out.print(SET_TEXT_COLOR_BLACK);
+
+        String[] boardRow = board[row];
+
+        if (color == ChessGame.TeamColor.WHITE) {
+            for (int col = 0; col < 8; col++) {
+                String squareColor;
+                if ((row + col) % 2 == 0) {
+                    squareColor = SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
+                }
+                out.print(squareColor + boardRow[col]);
+            }
+        } else {
+            for (int col = 7; col >= 0; col--) {
+                String squareColor;
+                if ((row + col) % 2 == 0) {
+                    squareColor = SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
+                }
+                out.print(squareColor + boardRow[col]);
+            }
+        }
+
+        out.print(SET_BG_COLOR_BLACK);
+        out.println();
     }
 
     private static String[][] boardGenerator(ChessBoard chessBoard) {
@@ -47,28 +88,29 @@ public class ChessBoardPrinter {
     }
 
     private static String getPieceChar(ChessPiece piece) {
-        var type = piece.getPieceType();
+        String pieceColor;
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            return getStr(type, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_PAWN);
+            pieceColor = SET_TEXT_COLOR_WHITE;
         } else {
-            return getStr(type, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_PAWN);
+            pieceColor = SET_TEXT_COLOR_BLACK;
         }
-    }
 
-    private static String getStr(ChessPiece.PieceType type, String king, String queen, String bishop, String knight, String rook, String pawn) {
+        var type = piece.getPieceType();
+        String pieceChar;
         if (type == ChessPiece.PieceType.KING) {
-            return king;
+            pieceChar = BLACK_KING;
         } else if (type == ChessPiece.PieceType.QUEEN) {
-            return queen;
+            pieceChar = BLACK_QUEEN;
         } else if (type == ChessPiece.PieceType.BISHOP) {
-            return bishop;
+            pieceChar = BLACK_BISHOP;
         } else if (type == ChessPiece.PieceType.KNIGHT) {
-            return knight;
+            pieceChar = BLACK_KNIGHT;
         } else if (type == ChessPiece.PieceType.ROOK) {
-            return rook;
+            pieceChar = BLACK_ROOK;
         } else {
-            return pawn;
+            pieceChar = BLACK_PAWN;
         }
-    }
 
+        return pieceColor + pieceChar;
+    }
 }
