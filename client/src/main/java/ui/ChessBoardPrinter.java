@@ -14,30 +14,30 @@ public class ChessBoardPrinter {
     public static void main(String[] args) {
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-
-        for (String[] line : boardGenerator(board)) {
-            for (String square : line) {
-                System.out.print(square);
-            }
-            System.out.println();
-        }
-
         var b = boardGenerator(board);
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        printLabelRow(out, ChessGame.TeamColor.WHITE);
-        printRowOfSquares(out, 0, b, ChessGame.TeamColor.WHITE);
-        printRowOfSquares(out, 0, b, ChessGame.TeamColor.BLACK);
-        printRowOfSquares(out, 7, b, ChessGame.TeamColor.WHITE);
-        printRowOfSquares(out, 7, b, ChessGame.TeamColor.BLACK);
-        printLabelRow(out, ChessGame.TeamColor.BLACK);
+
+        printBoardForWhite(out, b);
+        out.println();
+        printBoardForBlack(out, b);
     }
 
-    public static void printBoardForWhite(PrintStream out) {
-
+    public static void printBoardForWhite(PrintStream out, String[][] board) {
+        var white = ChessGame.TeamColor.WHITE;
+        printLabelRow(out, white);
+        for (int row = 7; row >=0; row--) {
+            printRowOfSquares(out, row, board, white);
+        }
+        printLabelRow(out, white);
     }
 
-    public static void printBoardForBlack(PrintStream out) {
-
+    public static void printBoardForBlack(PrintStream out, String[][] board) {
+        var black = ChessGame.TeamColor.BLACK;
+        printLabelRow(out, black);
+        for (int row = 0; row < 8; row++) {
+            printRowOfSquares(out, row, board, black);
+        }
+        printLabelRow(out, black);
     }
 
     private static void printLabelRow(PrintStream out, ChessGame.TeamColor color) {
