@@ -1,6 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import model.GameData;
+import request.*;
+import result.*;
 
 import java.io.IOException;
 import java.net.*;
@@ -13,14 +16,51 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {
+    public RegisterResult register(String username, String password, String email) {
+        var req = new RegisterRequest(username, password, email);
+        return makeRequest("POST", "/user", req, null, RegisterResult.class);
+    }
+
+    public LoginResult login(String username, String password) {
+        var req = new LoginRequest(username, password);
+        return makeRequest("POST", "/session", req, null, LoginResult.class);
+    }
+
+    public void logout(String authToken) {
+        makeRequest("DELETE", "/session", null, authToken, null);
+    }
+
+    public GameData[] listGames(String authToken) {
+        record ListGamesResult(GameData[] games) {
+        }
+        var games = makeRequest("GET", "/game", null, authToken, ListGamesResult.class); // TODO: see if this works?
+        return games.games();
+    }
+
+    public int createGame(String authToken, String gameName) {
+        return makeRequest("POST", "/game", gameName, authToken, Integer.class);
+    }
+
+    public void joinGame(String authToken, String playerColor, int gameID) {
+        record JoinGameInfo(String color, int id) {
+        }
+        var req = new JoinGameInfo(playerColor, gameID);
+        makeRequest("PUT", "/game", req, authToken, null);
+    }
+
+    public void clear() {
+        makeRequest("DELETE", "/db", null, null, null);
+    }
+
+    private <T> T makeRequest(String method, String path, Object requestBody, String authHeader, Class<T> responseClass) {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+            http.addRequestProperty("Authorization", authHeader);
 
-            writeBody(request, http);
+            writeBody(requestBody, http);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -40,12 +80,15 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         int status = http.getResponseCode();
         if (status / 100 != 2) {
-            try (InputStream response = http.getErrorStream()) {
-
+            try (InputStream errResp = http.getErrorStream()) {
+                if (errResp != null) {
+                    throw ResponseException.throwFromJson(errResp);
+                }
             }
+            throw new ResponseException(status, "Unexpected failure: " + status);
         }
     }
 
