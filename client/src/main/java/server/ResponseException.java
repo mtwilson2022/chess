@@ -16,7 +16,12 @@ public class ResponseException extends Exception {
 
     public static ResponseException throwFromJson(InputStream in) {
         var map = new Gson().fromJson(new InputStreamReader(in), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
+        int status;
+        if (map.get("status") != null) {
+            status = ((Double) map.get("status")).intValue();
+        } else {
+            status = 500;
+        }
         String message = map.get("message").toString();
         return new ResponseException(status, message);
     }

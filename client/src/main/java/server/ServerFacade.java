@@ -38,11 +38,15 @@ public class ServerFacade {
     }
 
     public int createGame(String authToken, String gameName) throws ResponseException {
-        return makeRequest("POST", "/game", gameName, authToken, Integer.class);
+        record CreateGameInfo(String gameName) {
+        }
+        var req = new CreateGameInfo(gameName);
+        var resp = makeRequest("POST", "/game", req, authToken, CreateGameResult.class);
+        return resp.gameID();
     }
 
     public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
-        record JoinGameInfo(String color, int id) {
+        record JoinGameInfo(String playerColor, int gameID) {
         }
         var req = new JoinGameInfo(playerColor, gameID);
         makeRequest("PUT", "/game", req, authToken, null);
