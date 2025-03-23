@@ -20,4 +20,26 @@ public class Postlogin implements Client {
         return "";
     }
 
+    public String logout() {
+        return "Logged out successfully.";
+    }
+
+    public String createGame() {
+        return "";
+    }
+
+    public String listGames() {
+        return "";
+    }
+
+    public String playGame() {
+        // phase 5: draw board from white/black's perspective
+        return "";
+    }
+
+    public String observeGame() {
+        // phase 5: draw board from White's perspective
+        return "";
+    }
+
 }

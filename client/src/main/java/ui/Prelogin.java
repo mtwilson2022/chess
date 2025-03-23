@@ -20,4 +20,14 @@ public class Prelogin implements Client {
         return "";
     }
 
+    public String register() {
+        return "";
+    }
+
+    public String login() {
+        return "";
+    }
+
+    // quit cmd just returns "quit"
+
 }

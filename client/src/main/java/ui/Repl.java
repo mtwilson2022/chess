@@ -22,7 +22,8 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         String result = "";
 
-        while (!result.equalsIgnoreCase("quit") || !result.equalsIgnoreCase("q")) {
+        // change the condition to account for logging out or exiting a game
+        while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
