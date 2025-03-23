@@ -16,43 +16,43 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult register(String username, String password, String email) {
+    public RegisterResult register(String username, String password, String email) throws ResponseException {
         var req = new RegisterRequest(username, password, email);
         return makeRequest("POST", "/user", req, null, RegisterResult.class);
     }
 
-    public LoginResult login(String username, String password) {
+    public LoginResult login(String username, String password) throws ResponseException {
         var req = new LoginRequest(username, password);
         return makeRequest("POST", "/session", req, null, LoginResult.class);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws ResponseException {
         makeRequest("DELETE", "/session", null, authToken, null);
     }
 
-    public GameData[] listGames(String authToken) {
+    public GameData[] listGames(String authToken) throws ResponseException {
         record ListGamesResult(GameData[] games) {
         }
         var games = makeRequest("GET", "/game", null, authToken, ListGamesResult.class); // TODO: see if this works?
         return games.games();
     }
 
-    public int createGame(String authToken, String gameName) {
+    public int createGame(String authToken, String gameName) throws ResponseException {
         return makeRequest("POST", "/game", gameName, authToken, Integer.class);
     }
 
-    public void joinGame(String authToken, String playerColor, int gameID) {
+    public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
         record JoinGameInfo(String color, int id) {
         }
         var req = new JoinGameInfo(playerColor, gameID);
         makeRequest("PUT", "/game", req, authToken, null);
     }
 
-    public void clear() {
+    public void clear() throws ResponseException {
         makeRequest("DELETE", "/db", null, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object requestBody, String authHeader, Class<T> responseClass) {
+    private <T> T makeRequest(String method, String path, Object requestBody, String authHeader, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -64,8 +64,10 @@ public class ServerFacade {
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (ResponseException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
         }
     }
 
