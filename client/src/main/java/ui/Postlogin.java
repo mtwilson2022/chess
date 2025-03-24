@@ -5,9 +5,11 @@ import server.ServerFacade;
 public class Postlogin implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
     private final ServerFacade server;
+    private final String authToken;
 
-    public Postlogin(String url) {
+    public Postlogin(String url, String auth) {
         server = new ServerFacade(url);
+        authToken = auth;
     }
 
     @Override
@@ -20,24 +22,24 @@ public class Postlogin implements Client {
         return "";
     }
 
-    public String logout() {
+    private String logout() {
         return "Logged out successfully.";
     }
 
-    public String createGame() {
+    private String createGame() {
         return "";
     }
 
-    public String listGames() {
+    private String listGames() {
         return "";
     }
 
-    public String playGame() {
+    private String playGame() {
         // phase 5: draw board from white/black's perspective
         return "";
     }
 
-    public String observeGame() {
+    private String observeGame() {
         // phase 5: draw board from White's perspective
         return "";
     }
