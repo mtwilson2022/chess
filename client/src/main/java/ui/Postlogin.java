@@ -5,9 +5,7 @@ import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
@@ -16,12 +14,12 @@ public class Postlogin implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
     private final ServerFacade server;
     private final String authToken;
-    private Map<Integer, Map<String, String>> gameInfo;
+    private Map<Integer, List<String>> gamesInfo;
 
     public Postlogin(String url, String auth) {
         server = new ServerFacade(url);
         authToken = auth;
-        gameInfo = new HashMap<>();
+        gamesInfo = new HashMap<>();
     }
 
     @Override
@@ -43,18 +41,46 @@ public class Postlogin implements Client {
         Scanner scanner = new Scanner(System.in);
         System.out.print("What would you like to name this game?" + prompt());
         String gameName = scanner.nextLine();
-        int gameID = server.createGame(authToken, gameName); // TODO: what do I do with the gameID?
+        server.createGame(authToken, gameName);
         return "";
     }
 
     private String listGames() throws ResponseException {
+        makeList();
+        for (int num : gamesInfo.keySet()) {
+            printGameInfo(num);
+        }
+        return ""; // TODO: print them out nicely
+    }
+
+    private void makeList() throws ResponseException {
+        gamesInfo.clear();
         GameData[] games = server.listGames(authToken);
-        return "";
+        int i = 0;
+        for (GameData game : games) {
+            i++;
+            processGame(game, i);
+        }
+    }
+
+    private void processGame(GameData game, Integer num) {
+        String name = game.gameName();
+        String white = game.whiteUsername();
+        String black = game.blackUsername();
+        var names = List.of(name, white, black);
+        gamesInfo.put(num, names);
+    }
+
+    private void printGameInfo(int gameNumber) {
+        var gameInfo = gamesInfo.get(gameNumber);
+        System.out.printf("Game %d  --  Name: %s  |  White player: %s  |  Black player: %s",
+                gameNumber, gameInfo.get(0), gameInfo.get(1), gameInfo.get(2));
+        System.out.println();
     }
 
     private String playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("What game do you want to join?" + prompt()); // TODO: they should enter the game number
+        System.out.print("Enter the number of the game you want to join" + prompt()); // TODO: they should enter the game number
         String gameName = scanner.nextLine();
         GameData[] games = server.listGames(authToken);
         int gameID = getGameID(gameName, games);
