@@ -6,13 +6,16 @@ import static ui.EscapeSequences.*;
 
 public class Repl {
     private final Client client;
+    private final State state;
 
     public Repl(String url) {
         client = new Prelogin(url);
+        state = State.PRE_LOGIN;
     }
 
-    public Repl(Client client) {
+    public Repl(Client client, State state) {
         this.client = client;
+        this.state = state;
     }
 
     public void run() {
@@ -20,15 +23,13 @@ public class Repl {
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
-        String result = "";
+        State result = state;
 
-        // change the condition to account for logging out or exiting a game
-        while (!result.equals("quit")) {
+        while (result == state) {
             printPrompt();
             String line = scanner.nextLine();
             try {
                 result = client.eval(line);
-                System.out.print(result);
             } catch (Exception e) {
                 System.out.print(e.getMessage());
             }

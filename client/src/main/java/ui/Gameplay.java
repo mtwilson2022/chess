@@ -2,6 +2,8 @@ package ui;
 
 import server.ServerFacade;
 
+import static ui.State.*;
+
 public class Gameplay implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
     private final ServerFacade server;
@@ -11,13 +13,13 @@ public class Gameplay implements Client {
     }
 
     @Override
-    public String help() {
-        return "";
+    public State help() {
+        return GAMEPLAY;
     }
 
     @Override
-    public String eval(String input) {
-        return "";
+    public State eval(String input) {
+        return null;
     }
 
     /*

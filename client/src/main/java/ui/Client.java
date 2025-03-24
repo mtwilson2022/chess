@@ -1,10 +1,11 @@
 package ui;
 
 public interface Client {
-    String eval(String input);
-    String help();
+    State eval(String input);
+    State help();
 
-    default String respondToUnknownCmd() {
-        return "Unknown command. Enter a different command, or enter 'h' to see options.";
+    default State respondToUnknownCmd(State state) {
+        System.out.print("Unknown command. Enter a different command, or enter 'h' to see options.");
+        return state;
     }
 }

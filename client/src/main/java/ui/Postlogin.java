@@ -9,6 +9,7 @@ import java.util.*;
 
 import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
+import static ui.State.*;
 
 public class Postlogin implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
@@ -23,34 +24,35 @@ public class Postlogin implements Client {
     }
 
     @Override
-    public String help() {
-        return "";
+    public State help() {
+        return POST_LOGIN;
     }
 
     @Override
-    public String eval(String input) {
-        return "";
-    }
+    public State eval(String input) {
+        return null;
+    } // default: respond to unknown cmd
 
-    private String logout() throws ResponseException {
+    private State logout() throws ResponseException {
         server.logout(authToken);
-        return "Logged out successfully."; // TODO: needs to exit the post-login state
+        System.out.print("Logged out successfully.");
+        return PRE_LOGIN;
     }
 
-    private String createGame() throws ResponseException {
+    private State createGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("What would you like to name this game?" + prompt());
         String gameName = scanner.nextLine();
         server.createGame(authToken, gameName);
-        return "";
+        return POST_LOGIN;
     }
 
-    private String listGames() throws ResponseException {
+    private State listGames() throws ResponseException {
         makeList();
         for (int num : gamesInfo.keySet()) {
             printGameInfo(num);
         }
-        return ""; // TODO: print them out nicely
+        return POST_LOGIN;
     }
 
     private void makeList() throws ResponseException {
@@ -78,16 +80,15 @@ public class Postlogin implements Client {
         System.out.println();
     }
 
-    private String playGame() throws ResponseException {
+    private State playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to join" + prompt()); // TODO: they should enter the game number
         String gameName = scanner.nextLine();
         GameData[] games = server.listGames(authToken);
         int gameID = getGameID(gameName, games);
         if (gameID == 0) {
-            return "No game with that name exists. Enter 'l' to see all games, or 'c' if you would like to create a new game.";
-        } else {
-            System.out.print("game");
+            System.out.print("No game with that name exists. Enter 'l' to see all games, or 'c' if you would like to create a new game.");
+            return POST_LOGIN;
         }
         String[][] gameBoard = ChessBoardPrinter.boardGenerator(new ChessBoard()); // change in phase 6
 
@@ -100,13 +101,14 @@ public class Postlogin implements Client {
         } else if (playerColor.equalsIgnoreCase("black")) {
             ChessBoardPrinter.printBoardForBlack(System.out, gameBoard);
         } else {
-            return "That player color does not exist. You may play as 'white' or 'black'.";
+            System.out.print("That player color does not exist. You may play as 'white' or 'black'.");
+            return POST_LOGIN;
         }
 
-        return "";
+        return POST_LOGIN;
     }
 
-    private String observeGame() throws ResponseException {
+    private State observeGame() throws ResponseException {
         // phase 5: draw board from White's perspective
         Scanner scanner = new Scanner(System.in);
         System.out.print("What game do you want to join?" + prompt());
@@ -114,13 +116,13 @@ public class Postlogin implements Client {
         GameData[] games = server.listGames(authToken);
         int gameID = getGameID(gameName, games);
         if (gameID == 0) {
-            return "No game with that name exists. Enter 'l' to see all games, or 'c' if you would like to create a new game.";
+            System.out.print("No game with that name exists. Enter 'l' to see all games, or 'c' if you would like to create a new game.");
+        } else {
+            String[][] gameBoard = ChessBoardPrinter.boardGenerator(new ChessBoard()); // change in phase 6
+            ChessBoardPrinter.printBoardForWhite(System.out, gameBoard);
         }
 
-        String[][] gameBoard = ChessBoardPrinter.boardGenerator(new ChessBoard()); // change in phase 6
-        ChessBoardPrinter.printBoardForWhite(System.out, gameBoard);
-
-        return "";
+        return POST_LOGIN;
     }
 
     private int getGameID(String name, GameData[] games) {
