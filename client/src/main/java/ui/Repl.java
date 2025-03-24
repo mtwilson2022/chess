@@ -16,7 +16,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("Welcome to Chess! Register or login to play.");
+        System.out.println("Welcome to Chess! Register or login to play."); // change for different states
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);

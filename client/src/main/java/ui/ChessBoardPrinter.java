@@ -108,7 +108,7 @@ public class ChessBoardPrinter {
         out.print(" " + num + " ");
     }
 
-    private static String[][] boardGenerator(ChessBoard chessBoard) {
+    public static String[][] boardGenerator(ChessBoard chessBoard) {
         String[][] charBoard = new String[8][8];
         var board = chessBoard.getBoardAsGrid();
 
