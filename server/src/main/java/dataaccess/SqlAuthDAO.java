@@ -70,4 +70,24 @@ public class SqlAuthDAO extends SqlDataAccess implements AuthDAO {
             throw new DataAccessException(e.getMessage());
         }
     }
+
+    /*
+    The following method is employed tests in several modules.
+     */
+    public static int authCount() throws DataAccessException {
+        int numAuths = 0;
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT authToken, username FROM auth";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        numAuths++;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+        return numAuths;
+    }
 }

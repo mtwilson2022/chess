@@ -3,6 +3,8 @@ package dataaccess;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 
+import static dataaccess.SqlAuthDAO.authCount;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -97,23 +99,6 @@ public class AuthDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static int authCount() throws DataAccessException {
-        int numAuths = 0;
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authToken, username FROM auth";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                try (var rs = preparedStatement.executeQuery()) {
-                    while (rs.next()) {
-                        numAuths++;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        return numAuths;
     }
 
     @Test

@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static dataaccess.AuthDAOTests.authCount;
+import static dataaccess.SqlAuthDAO.authCount;
 
 public class ServerFacadeTests {
 
