@@ -99,7 +99,7 @@ public class AuthDAOTests {
         }
     }
 
-    private static int authCount() throws DataAccessException {
+    public static int authCount() throws DataAccessException {
         int numAuths = 0;
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT authToken, username FROM auth";

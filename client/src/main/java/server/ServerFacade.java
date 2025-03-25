@@ -33,7 +33,7 @@ public class ServerFacade {
     public GameData[] listGames(String authToken) throws ResponseException {
         record ListGamesResult(GameData[] games) {
         }
-        var games = makeRequest("GET", "/game", null, authToken, ListGamesResult.class); // TODO: see if this works?
+        var games = makeRequest("GET", "/game", null, authToken, ListGamesResult.class);
         return games.games();
     }
 
