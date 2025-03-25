@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+import static dataaccess.AuthDAOTests.authCount;
 
 public class ServerFacadeTests {
 
@@ -225,23 +225,6 @@ public class ServerFacadeTests {
 
     private int createG1(String authToken) throws ResponseException {
         return facade.createGame(authToken, "new game");
-    }
-
-    private static int authCount() throws DataAccessException {
-        int numAuths = 0;
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT authToken, username FROM auth";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                try (var rs = preparedStatement.executeQuery()) {
-                    while (rs.next()) {
-                        numAuths++;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-        return numAuths;
     }
 
     private static int gameCount() throws DataAccessException {
