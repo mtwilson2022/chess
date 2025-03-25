@@ -20,29 +20,48 @@ public class Prelogin implements Client {
 
     @Override
     public State help() {
-        System.out.print("To create an account: 'r' or 'register'" + "\n" +
-                "To login: 'l' or 'login'" + "\n" +
-                "To exit the application: 'q' or 'quit'" + "\n" +
-                "To see available commands: 'h' or 'help'");
+        System.out.print("""
+                To create an account: 'r' or 'register'
+                To login: 'l' or 'login'
+                To exit the application: 'q' or 'quit'
+                To see available commands: 'h' or 'help' \n""");
         return PRE_LOGIN;
     }
 
     @Override
-    public State eval(String input) {
-        return null;
+    public State eval(String input) throws ResponseException {
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+
+        return switch (cmd) {
+            case "help", "h" -> help();
+            case "register", "r" -> register();
+            case "login", "l" -> login();
+            case "quit", "q" -> quit();
+            default -> respondToUnknownCmd(PRE_LOGIN);
+        };
     }
 
     private State register() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter a username" + prompt());
         String username = scanner.nextLine();
+        if (username.isEmpty()) {
+            username = null;
+        }
         System.out.print("Enter a password" + prompt());
         String password = scanner.nextLine();
+        if (password.isEmpty()) {
+            password = null;
+        }
         System.out.print("Enter your email" + prompt());
         String email = scanner.nextLine();
+        if (email.isEmpty()) {
+            email = null;
+        }
 
         var res = server.register(username, password, email);
-        System.out.printf("%s registered successfully!", username);
+        System.out.printf("%s registered successfully!\n", username);
 
         var repl = beginPostLoginLoop(res.authToken());
         repl.run();
@@ -58,7 +77,7 @@ public class Prelogin implements Client {
         String password = scanner.nextLine();
 
         var res = server.login(username, password);
-        System.out.printf("%s logged in successfully!", username);
+        System.out.printf("%s logged in successfully!\n", username);
 
         var repl = beginPostLoginLoop(res.authToken());
         repl.run();

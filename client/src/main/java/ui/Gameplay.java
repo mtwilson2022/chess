@@ -1,5 +1,6 @@
 package ui;
 
+import server.ResponseException;
 import server.ServerFacade;
 
 import static ui.State.*;
@@ -18,7 +19,7 @@ public class Gameplay implements Client {
     }
 
     @Override
-    public State eval(String input) {
+    public State eval(String input) throws ResponseException {
         return null;
     }
 
