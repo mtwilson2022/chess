@@ -15,12 +15,14 @@ import static ui.State.*;
 public class Postlogin implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
     private final ServerFacade server;
+    private final String serverUrl;
     private final String authToken;
     private final Map<Integer, List<String>> gamesInfo;
     private final Map<Integer, Integer> gameIDs;
 
     public Postlogin(String url, String auth) {
-        server = new ServerFacade(url);
+        serverUrl = url;
+        server = new ServerFacade(serverUrl);
         authToken = auth;
         gamesInfo = new HashMap<>();
         gameIDs = new HashMap<>();
@@ -115,6 +117,7 @@ public class Postlogin implements Client {
         System.out.println();
     }
 
+    // TODO: begin Gameplay REPL
     private State playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to join" + prompt());
@@ -153,6 +156,7 @@ public class Postlogin implements Client {
         return POST_LOGIN;
     }
 
+    // TODO: begin Gameplay REPL
     private State observeGame() { // throws ResponseException
         // phase 5: draw board from White's perspective
         Scanner scanner = new Scanner(System.in);
@@ -187,5 +191,10 @@ public class Postlogin implements Client {
 
     private String prompt() {
         return SET_TEXT_COLOR_YELLOW + " >>> " + SET_TEXT_COLOR_WHITE;
+    }
+
+    private Repl beginGameplayLoop() throws ResponseException {
+        var client = new Gameplay(serverUrl);
+        return new Repl(client, GAMEPLAY);
     }
 }

@@ -11,12 +11,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 //need to extend Endpoint for websocket to work properly
-public class WebSocketCommunicator extends Endpoint {
+public class WebSocketFacade extends Endpoint {
 
     Session session;
     ServerMessageObserver observer;
 
-    public WebSocketCommunicator(String url, ServerMessageObserver observer) throws ResponseException {
+    public WebSocketFacade(String url, ServerMessageObserver observer) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
