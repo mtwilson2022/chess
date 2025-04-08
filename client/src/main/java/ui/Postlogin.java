@@ -193,8 +193,8 @@ public class Postlogin implements Client {
         return SET_TEXT_COLOR_YELLOW + " >>> " + SET_TEXT_COLOR_WHITE;
     }
 
-    private Repl beginGameplayLoop() throws ResponseException {
-        var client = new Gameplay(serverUrl);
+    private Repl beginGameplayLoop(Integer gameID) throws ResponseException {
+        var client = new Gameplay(serverUrl, authToken, gameID);
         return new Repl(client, GAMEPLAY);
     }
 }

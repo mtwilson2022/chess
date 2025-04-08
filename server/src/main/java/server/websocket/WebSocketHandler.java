@@ -18,7 +18,7 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
-            UserGameCommand command = Serializer.fromJson(msg, UserGameCommand.class);
+            UserGameCommand command = Serializer.fromJson(msg, UserGameCommand.class); // TODO: may need to do extra work to deserialize
 
             // Throws a custom UnauthorizedException. Yours may work differently.
             String username = getUsername(command.getAuthToken());
