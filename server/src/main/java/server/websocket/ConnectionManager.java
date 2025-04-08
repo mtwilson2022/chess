@@ -10,20 +10,36 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
-        connections.put(visitorName, connection);
+    public void add(String playerName, Session session) {
+        var connection = new Connection(playerName, session);
+        connections.put(playerName, connection);
     }
 
-    public void remove(String visitorName) {
-        connections.remove(visitorName);
+    public void remove(String playerName) {
+        connections.remove(playerName);
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage msg) throws IOException {
+    public void broadcastToAll(ServerMessage msg) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.visitorName.equals(excludeVisitorName)) {
+                c.send(msg.toString());
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        // Clean up any connections that were left open.
+        for (var c : removeList) {
+            connections.remove(c.playerName);
+        }
+    }
+
+    public void broadcastToOthers(String excludePlayerName, ServerMessage msg) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                if (!c.playerName.equals(excludePlayerName)) {
                     c.send(msg.toString()); // TODO: msg has no text, nor toString method
                 }
             } else {
@@ -33,7 +49,7 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.visitorName);
+            connections.remove(c.playerName);
         }
     }
 }

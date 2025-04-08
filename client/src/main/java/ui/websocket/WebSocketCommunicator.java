@@ -2,7 +2,6 @@ package ui.websocket;
 
 import com.google.gson.Gson;
 import server.ResponseException; // TODO: may need to move to shared?
-import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import websocket.ServerMessageObserver;
 
@@ -12,12 +11,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 //need to extend Endpoint for websocket to work properly
-public class WebSocketFacade extends Endpoint {
+public class WebSocketCommunicator extends Endpoint {
 
     Session session;
     ServerMessageObserver observer;
 
-    public WebSocketFacade(String url, ServerMessageObserver observer) throws ResponseException {
+    public WebSocketCommunicator(String url, ServerMessageObserver observer) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
