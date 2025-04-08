@@ -17,11 +17,13 @@ public class Postlogin implements Client {
     private final ServerFacade server;
     private final String authToken;
     private final Map<Integer, List<String>> gamesInfo;
+    private final Map<Integer, Integer> gameIDs;
 
     public Postlogin(String url, String auth) {
         server = new ServerFacade(url);
         authToken = auth;
         gamesInfo = new HashMap<>();
+        gameIDs = new HashMap<>();
     }
 
     @Override
@@ -74,6 +76,9 @@ public class Postlogin implements Client {
         for (int num : gamesInfo.keySet()) {
             printGameInfo(num);
         }
+        if (gamesInfo.isEmpty()) {
+            System.out.print("There are currently no games.\n");
+        }
         return POST_LOGIN;
     }
 
@@ -97,8 +102,10 @@ public class Postlogin implements Client {
         if (black == null) {
             black = SET_TEXT_COLOR_BLUE + "<available>" + SET_TEXT_COLOR_WHITE;
         }
+        int id = game.gameID();
         var names = List.of(name, white, black);
         gamesInfo.put(num, names);
+        gameIDs.put(num, id);
     }
 
     private void printGameInfo(int gameNumber) {
@@ -108,10 +115,14 @@ public class Postlogin implements Client {
         System.out.println();
     }
 
-    private State playGame() { // throws ResponseException
+    private State playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to join" + prompt());
-        int gameNum = Integer.parseInt(scanner.nextLine());
+        int gameNum = getGameNum(scanner);
+        if (gameNum == 0) {
+            System.out.print("Invalid input. Please enter a number for the game you want to join.\n");
+            return POST_LOGIN;
+        }
 
         var gameInfo = gamesInfo.get(gameNum);
         if (gameInfo == null) {
@@ -125,6 +136,8 @@ public class Postlogin implements Client {
 
         System.out.print("Enter a color to play as (either 'white' or 'black')" + prompt());
         String playerColor = scanner.nextLine();
+
+        server.joinGame(authToken, playerColor, gameIDs.get(gameNum));
 
         // phase 5: draw board from white/black's perspective
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
@@ -144,7 +157,11 @@ public class Postlogin implements Client {
         // phase 5: draw board from White's perspective
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to observe" + prompt());
-        int gameNum = Integer.parseInt(scanner.nextLine());
+        int gameNum = getGameNum(scanner);
+        if (gameNum == 0) {
+            System.out.print("Please enter a number for the game you want to join.");
+            return POST_LOGIN;
+        }
 
         var gameInfo = gamesInfo.get(gameNum);
         if (gameInfo == null) {
@@ -158,6 +175,14 @@ public class Postlogin implements Client {
         }
 
         return POST_LOGIN;
+    }
+
+    private int getGameNum(Scanner scanner) {
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private String prompt() {
