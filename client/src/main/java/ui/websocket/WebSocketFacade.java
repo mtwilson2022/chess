@@ -1,10 +1,8 @@
 package ui.websocket;
 
 import com.google.gson.Gson;
-import server.ResponseException; // TODO: may need to move to shared?
-import websocket.commands.LeaveCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.ResignCommand;
+import server.ResponseException;
+import websocket.commands.*;
 import websocket.messages.ServerMessage;
 import websocket.ServerMessageObserver;
 import chess.*;
@@ -47,12 +45,13 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    /*
-    Redraws the board upon the user's request.
-     */
-    public void redrawBoard() throws ResponseException {
-        // let's do this later.
-        // may use http rather than ws? If so, then move this out of WSF
+    public void connect(String authToken, Integer gameID) throws ResponseException {
+        try {
+            var cmd = new ConnectCommand(authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
     }
 
     public void leaveGame(String authToken, Integer gameID) throws ResponseException {
@@ -81,15 +80,4 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
-    /*
-    Allows the user to input the piece for which they want to highlight legal moves.
-    The selected piece’s current square and all squares it can legally move to are highlighted.
-    This is a local operation and has no effect on remote users’ screens.
-     */
-    public void highlightLegalMoves(ChessPosition position) throws ResponseException {
-        // let's do this later.
-        // may use http rather than ws? If so, take this out of the WSF
-    }
-
 }

@@ -117,7 +117,7 @@ public class Postlogin implements Client {
         System.out.println();
     }
 
-    // TODO: begin Gameplay REPL
+    // TODO: begin Gameplay REPL and connect user through gameplay connect() function
     private State playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to join" + prompt());
@@ -156,7 +156,7 @@ public class Postlogin implements Client {
         return POST_LOGIN;
     }
 
-    // TODO: begin Gameplay REPL
+    // TODO: begin Gameplay REPL and connect user
     private State observeGame() { // throws ResponseException
         // phase 5: draw board from White's perspective
         Scanner scanner = new Scanner(System.in);
@@ -195,6 +195,7 @@ public class Postlogin implements Client {
 
     private Repl beginGameplayLoop(Integer gameID) throws ResponseException {
         var client = new Gameplay(serverUrl, authToken, gameID);
+        client.connectGame();
         return new Repl(client, GAMEPLAY);
     }
 }

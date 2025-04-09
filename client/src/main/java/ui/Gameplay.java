@@ -3,6 +3,7 @@ package ui;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
+import org.glassfish.grizzly.http.server.Response;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.websocket.WebSocketFacade;
@@ -31,7 +32,7 @@ public class Gameplay implements Client {
         ws = new WebSocketFacade(url, new ServerMessageObserver() {
             @Override
             public void notify(ServerMessage message) {
-                // TODO: put stuff here
+                // TODO: probably need to deserialize the message once to get subclass, then deserialize again
             }
         });
     }
@@ -44,6 +45,15 @@ public class Gameplay implements Client {
     @Override
     public State eval(String input) throws ResponseException {
         return null;
+    }
+
+    /**
+     * This method is called in the transition from the postlogin to gameplay UI.
+     * It establishes a user's WebSocket connection and alerts other users.
+     * @throws ResponseException if something bad happens
+     */
+    public void connectGame() throws ResponseException {
+        ws.connect(authToken, gameID);
     }
 
     /*
@@ -66,7 +76,7 @@ public class Gameplay implements Client {
     Allow the user to input what move they want to make. The board is updated to reflect the result of the move,
     and the board automatically updates on all clients involved in the game.
      */
-    public void makeMove(ChessMove move) throws ResponseException {
+    private void makeMove(ChessMove move) throws ResponseException {
 
     }
 
@@ -74,7 +84,7 @@ public class Gameplay implements Client {
     Prompts the user to confirm they want to resign. If they do, the user forfeits the game and the game is over.
     Does not cause the user to leave the game.
      */
-    public void resign() throws ResponseException {
+    private void resign() throws ResponseException {
 
     }
 
@@ -83,7 +93,7 @@ public class Gameplay implements Client {
     The selected piece’s current square and all squares it can legally move to are highlighted.
     This is a local operation and has no effect on remote users’ screens.
      */
-    public void highlightLegalMoves(ChessPosition position) throws ResponseException {
+    private void highlightLegalMoves(ChessPosition position) throws ResponseException {
         // let's do this later.
         // may use http rather than ws? If so, take this out of the WSF
     }

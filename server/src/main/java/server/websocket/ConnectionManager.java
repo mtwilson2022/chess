@@ -1,5 +1,6 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -23,7 +24,7 @@ public class ConnectionManager {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                c.send(msg.toString());
+                c.send(serialize(msg));
             } else {
                 removeList.add(c);
             }
@@ -40,7 +41,7 @@ public class ConnectionManager {
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if (!c.playerName.equals(excludePlayerName)) {
-                    c.send(msg.toString()); // TODO: msg has no text, nor toString method
+                    c.send(serialize(msg));
                 }
             } else {
                 removeList.add(c);
@@ -51,5 +52,28 @@ public class ConnectionManager {
         for (var c : removeList) {
             connections.remove(c.playerName);
         }
+    }
+
+    public void broadcastToRoot(String rootUsername, ServerMessage msg) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                if (c.playerName.equals(rootUsername)) {
+                    c.send(serialize(msg));
+                }
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        // Clean up any connections that were left open.
+        for (var c : removeList) {
+            connections.remove(c.playerName);
+        }
+    }
+
+    private String serialize(ServerMessage msg) {
+        var gson = new Gson();
+        return gson.toJson(msg);
     }
 }
