@@ -27,6 +27,7 @@ public class Gameplay implements Client {
         authToken = auth;
         gameID = id;
         server = new ServerFacade(url);
+
         ws = new WebSocketFacade(url, new ServerMessageObserver() {
             @Override
             public void notify(ServerMessage message) {

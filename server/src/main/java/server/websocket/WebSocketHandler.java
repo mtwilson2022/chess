@@ -1,11 +1,17 @@
 package server.websocket;
 
-import exception.ResponseException; // TODO: from client. is it necessary?
+import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+
 import websocket.commands.*;
 import websocket.messages.*;
+import dataaccess.UnauthorizedException;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.AuthDAO;
 
 import java.io.IOException;
 
@@ -13,14 +19,22 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
 
-    private final ConnectionManager connections = new ConnectionManager();
+    private final ConnectionManager connections;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+
+    public WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+        connections = new ConnectionManager();
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
-            UserGameCommand command = Serializer.fromJson(msg, UserGameCommand.class); // TODO: may need to do extra work to deserialize
+            var serializer = new Gson();
+            UserGameCommand command = serializer.fromJson(msg, UserGameCommand.class); // TODO: may need to do extra work to deserialize, esp. with MakeMove
 
-            // Throws a custom UnauthorizedException. Yours may work differently.
             String username = getUsername(command.getAuthToken());
 
             saveSession(command.getGameID(), session); // get it into the connection manager
@@ -31,7 +45,7 @@ public class WebSocketHandler {
                 case LEAVE -> leaveGame(session, username, (LeaveCommand) command);
                 case RESIGN -> resign(session, username, (ResignCommand) command);
             }
-        } catch (UnauthorizedException ex) {
+        } catch (UnauthorizedException ex) { // from the getUsername func
             // Serializes and sends the error message
             sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
         } catch (Exception ex) {
@@ -40,12 +54,25 @@ public class WebSocketHandler {
         }
     }
 
-    private void saveSession(Integer gameID, Session session) {
-
+    private String getUsername(String authToken) throws DataAccessException {
+        var auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return auth.username();
     }
 
-    private void connect(Session session, String username, ConnectCommand command) {
+    private void saveSession(Integer gameID, Session session) {
+        // because connections is a Map<String, Connection> we need to turn the gameID into a string
+        String id = gameID.toString();
+        connections.add(id, session);
+    }
 
+    private void connect(Session session, String username, ConnectCommand command) throws IOException {
+        connections.add(username, session);
+        var message = String.format("%s has joined the game.", username);
+        var serverMsg = new NotificationMessage(message);
+        connections.broadcastToOthers(username, serverMsg);
     }
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
@@ -61,6 +88,9 @@ public class WebSocketHandler {
     }
 
 
+    private void sendMessage(RemoteEndpoint remote, ErrorMessage errorMessage) {
+    }
+
     // PetShop
 //    @OnWebSocketMessage
 //    public void onMessage(Session session, String message) throws IOException {
@@ -70,15 +100,5 @@ public class WebSocketHandler {
 //            case EXIT -> exit(action.visitorName());
 //        }
 //    }
-
-    /*
-    replace with the various command methods
-     */
-    private void enter(String visitorName, Session session) throws IOException {
-        connections.add(visitorName, session);
-        var message = String.format("%s is in the shop", visitorName);
-        var notification = new Notification(Notification.Type.ARRIVAL, message);
-        connections.broadcast(visitorName, notification);
-    }
 
 }

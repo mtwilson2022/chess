@@ -27,7 +27,7 @@ public class Server {
             userHandler = new UserHandler(new UserService(userDAO, authDAO));
             gameHandler = new GameHandler(new GameService(gameDAO, authDAO));
 
-            webSocketHandler = new WebSocketHandler();
+            webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
