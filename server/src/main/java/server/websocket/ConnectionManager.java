@@ -26,6 +26,9 @@ public class ConnectionManager {
 
     public void remove(Integer gameID, String playerName) {
         connections.get(gameID).remove(playerName);
+        if (connections.get(gameID) == null) {
+            connections.remove(gameID);
+        }
     }
 
     public void broadcastToAll(Integer gameID, ServerMessage msg) throws IOException {
@@ -40,7 +43,7 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.playerName);
+            connections.get(gameID).remove(c.playerName);
         }
     }
 
@@ -58,7 +61,7 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.playerName);
+            connections.get(gameID).remove(c.playerName);
         }
     }
 
@@ -76,7 +79,7 @@ public class ConnectionManager {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            connections.remove(c.playerName);
+            connections.get(gameID).remove(c.playerName);
         }
     }
 

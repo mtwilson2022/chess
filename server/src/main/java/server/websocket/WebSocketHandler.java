@@ -1,7 +1,6 @@
 package server.websocket;
 
 import chess.ChessBoard;
-import chess.ChessGame;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
@@ -17,7 +16,6 @@ import dataaccess.GameDAO;
 import dataaccess.AuthDAO;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @WebSocket
@@ -51,6 +49,8 @@ public class WebSocketHandler {
         } catch (UnauthorizedException ex) { // from the getUsername func
             // Serializes and sends the error message
             sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
+        } catch (IllegalCommandException ex) {
+            sendMessage(session.getRemote(), new ErrorMessage("Error: that action may not be performed"));
         } catch (Exception ex) {
             ex.printStackTrace();
             sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
@@ -83,6 +83,9 @@ public class WebSocketHandler {
         return auth.username();
     }
 
+    /*
+    Sends LOAD_GAME back to client, and NOTIFICATION to others (including their player color / observing)
+     */
     private void connect(Integer gameID, Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
         connections.add(gameID, username, session);
 
@@ -95,15 +98,32 @@ public class WebSocketHandler {
         connections.broadcastToOthers(gameID, username, serverMsg);
     }
 
-    private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException {
+    /*
+    Needs to do the following:
+     - verify the move is valid
+     - make the move and update the game
+     - send LOAD_GAME to all
+     - send NOTIFICATION to others
+     - if move leads to check, checkmate, or stalemate, send NOTIFICATION to all
+    Once a game is over, no one may resign or make a move.
+     */
+    private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
 
     }
 
+    /*
+    Player / observer's connection is removed; a message is broadcast to the other clients.
+    If playing the game, they are also cleared from the database.
+     */
     private void leaveGame(Integer gameID, Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
 
     }
 
-    private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException {
+    /*
+    Mark the game as over. Once a game is over, no one may resign or make a move.
+    Send NOTIFICATION to all
+     */
+    private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException, IllegalCommandException {
 
     }
 

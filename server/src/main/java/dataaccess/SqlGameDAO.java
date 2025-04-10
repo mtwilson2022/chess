@@ -138,4 +138,34 @@ public class SqlGameDAO extends SqlDataAccess implements GameDAO {
             throw new DataAccessException(e.getMessage());
         }
     }
+
+    /*
+    Phase 6 gameplay functionality. Methods used by the WebSocketHandler.
+     */
+
+    public void updateChessGame(Integer gameID, String gameJson) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE game SET gameJson = ? WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, gameJson);
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
+
+    public void markGameAsWon(Integer gameID, String winningUser) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE game SET gameWinner = ? WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, winningUser);
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
+    }
 }
