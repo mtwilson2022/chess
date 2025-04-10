@@ -14,4 +14,15 @@ public interface GameDAO {
     void updateGame(String username, String playerColor, Integer gameID) throws DataAccessException;
 
     void clearAllGames() throws DataAccessException;
+
+    /*
+    Phase 6 functions. Only needed to be implemented for SQL DAO
+     */
+    default void updateChessGame(Integer gameID, String gameJson) throws DataAccessException {
+    }
+    default void markGameAsWon(Integer gameID, String winningUser) throws DataAccessException {
+    }
+    default boolean gameStillGoing(Integer gameID) throws DataAccessException {
+        return true;
+    }
 }

@@ -9,6 +9,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import websocket.commands.*;
 import static websocket.commands.UserGameCommand.CommandType.*;
+import static websocket.commands.UserGameCommand.ClientRole.*;
 import websocket.messages.*;
 import dataaccess.UnauthorizedException;
 import dataaccess.DataAccessException;
@@ -108,6 +109,10 @@ public class WebSocketHandler {
     Once a game is over, no one may resign or make a move.
      */
     private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
+        if (!gameDAO.gameStillGoing(gameID)) {
+            throw new IllegalCommandException("Error: the game has already ended.");
+        }
+
 
     }
 
@@ -116,7 +121,18 @@ public class WebSocketHandler {
     If playing the game, they are also cleared from the database.
      */
     private void leaveGame(Integer gameID, Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
+        var role = command.getRole();
+        if (role == WHITE_PLAYER) {
+            gameDAO.updateGame(null, "white", gameID);
+        } else if (role == BLACK_PLAYER) {
+            gameDAO.updateGame(null, "black", gameID);
+        }
 
+        connections.remove(gameID, username);
+
+        var notifyStr = String.format("%s has left the game.", username);
+        var serverMsg = new NotificationMessage(notifyStr);
+        connections.broadcastToOthers(gameID, username, serverMsg);
     }
 
     /*
@@ -124,7 +140,32 @@ public class WebSocketHandler {
     Send NOTIFICATION to all
      */
     private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException, IllegalCommandException {
+        if (!gameDAO.gameStillGoing(gameID)) {
+            throw new IllegalCommandException("Error: the game has already ended.");
+        }
 
+        var role = command.getRole();
+        var gameData = gameDAO.getGame(gameID);
+
+        if (role == WHITE_PLAYER) {
+            String black = gameData.blackUsername();
+            gameDAO.markGameAsWon(gameID, black);
+
+            var notifyStr = String.format("%s has resigned.", username);
+            var serverMsg = new NotificationMessage(notifyStr);
+            connections.broadcastToAll(gameID, serverMsg);
+
+        } else if (role == BLACK_PLAYER) {
+            String white = gameData.whiteUsername();
+            gameDAO.markGameAsWon(gameID, white);
+
+            var notifyStr = String.format("%s has resigned.", username);
+            var serverMsg = new NotificationMessage(notifyStr);
+            connections.broadcastToAll(gameID, serverMsg);
+
+        } else {
+            throw new IllegalCommandException("Error: observers may not resign from the game.");
+        }
     }
 
     private ChessBoard getCurrentGameBoard(int gameID) throws DataAccessException {
