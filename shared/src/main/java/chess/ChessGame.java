@@ -15,6 +15,7 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
     private final MoveHistory moveHistory;
+    private boolean gameOver;
 
     public ChessGame() {
         // settings for starting a new game
@@ -22,6 +23,7 @@ public class ChessGame {
         this.board = new ChessBoard();
         board.resetBoard();
         this.moveHistory = new MoveHistory();
+        this.gameOver = false;
     }
 
     /**
@@ -307,6 +309,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return this.board;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void markGameAsOver() {
+        gameOver = true;
     }
 
 

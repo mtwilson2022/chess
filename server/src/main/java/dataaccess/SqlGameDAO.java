@@ -156,34 +156,4 @@ public class SqlGameDAO extends SqlDataAccess implements GameDAO {
             throw new DataAccessException(e.getMessage());
         }
     }
-
-    @Override
-    public void markGameAsWon(Integer gameID, String winningUser) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "UPDATE game SET gameWinner = ? WHERE gameID = ?";
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setString(1, winningUser);
-                preparedStatement.setInt(2, gameID);
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
-
-    @Override
-    public boolean gameStillGoing(Integer gameID) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            String statement = "SELECT gameWinner FROM game WHERE gameID = ?";
-
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.setInt(1, gameID);
-                try (var rs = preparedStatement.executeQuery()) {
-                    return !rs.next();
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
 }

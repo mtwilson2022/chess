@@ -51,7 +51,7 @@ public class WebSocketHandler {
             // Serializes and sends the error message
             sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
         } catch (IllegalCommandException ex) {
-            sendMessage(session.getRemote(), new ErrorMessage("Error: that action may not be performed"));
+            sendMessage(session.getRemote(), new ErrorMessage(ex.getMessage()));
         } catch (Exception ex) {
             ex.printStackTrace();
             sendMessage(session.getRemote(), new ErrorMessage("Error: " + ex.getMessage()));
@@ -109,10 +109,13 @@ public class WebSocketHandler {
     Once a game is over, no one may resign or make a move.
      */
     private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
-        if (!gameDAO.gameStillGoing(gameID)) {
+        var role = command.getRole();
+        var gameData = gameDAO.getGame(gameID);
+        var chessGame = gameData.game();
+
+        if (chessGame.isGameOver()) {
             throw new IllegalCommandException("Error: the game has already ended.");
         }
-
 
     }
 
@@ -140,24 +143,23 @@ public class WebSocketHandler {
     Send NOTIFICATION to all
      */
     private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException, IllegalCommandException {
-        if (!gameDAO.gameStillGoing(gameID)) {
+        var role = command.getRole();
+        var gameData = gameDAO.getGame(gameID);
+        var chessGame = gameData.game();
+
+        if (chessGame.isGameOver()) {
             throw new IllegalCommandException("Error: the game has already ended.");
         }
 
-        var role = command.getRole();
-        var gameData = gameDAO.getGame(gameID);
-
         if (role == WHITE_PLAYER) {
-            String black = gameData.blackUsername();
-            gameDAO.markGameAsWon(gameID, black);
+            chessGame.markGameAsOver();
 
             var notifyStr = String.format("%s has resigned.", username);
             var serverMsg = new NotificationMessage(notifyStr);
             connections.broadcastToAll(gameID, serverMsg);
 
         } else if (role == BLACK_PLAYER) {
-            String white = gameData.whiteUsername();
-            gameDAO.markGameAsWon(gameID, white);
+            chessGame.markGameAsOver();
 
             var notifyStr = String.format("%s has resigned.", username);
             var serverMsg = new NotificationMessage(notifyStr);

@@ -46,7 +46,6 @@ public class SqlDataAccess {
             blackUsername VARCHAR(255),
             gameName VARCHAR(255) NOT NULL,
             gameJson TEXT NOT NULL,
-            gameWinner VARCHAR(255),
             PRIMARY KEY (gameID)
             );
             """

@@ -20,9 +20,4 @@ public interface GameDAO {
      */
     default void updateChessGame(Integer gameID, String gameJson) throws DataAccessException {
     }
-    default void markGameAsWon(Integer gameID, String winningUser) throws DataAccessException {
-    }
-    default boolean gameStillGoing(Integer gameID) throws DataAccessException {
-        return true;
-    }
 }
