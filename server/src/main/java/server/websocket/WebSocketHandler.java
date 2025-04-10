@@ -33,7 +33,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String msg) {
+    public void onMessage(Session session, String msg) throws IOException {
         try {
             var command = getCommand(msg);
 
@@ -88,27 +88,27 @@ public class WebSocketHandler {
         connections.add(id, session); // TODO: can't do it like this b/c messages will be broadast to it (I think)
     }
 
-    private void connect(Session session, String username, ConnectCommand command) throws IOException, DataAccessException { // TODO: use the command thou fool
+    private void connect(Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
         connections.add(username, session);
 
         var game = getCurrentGameBoard(command.getGameID());
         var gameMsg = new LoadGameMessage(game);
         connections.broadcastToRoot(username, gameMsg);
 
-        var notifyStr = String.format("%s has joined the game.", username);
+        var notifyStr = String.format("%s has joined the game.", username); // TODO: add player/observer functionality
         var serverMsg = new NotificationMessage(notifyStr);
         connections.broadcastToOthers(username, serverMsg);
     }
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) throws DataAccessException {
+    private void makeMove(Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException {
 
     }
 
-    private void leaveGame(Session session, String username, LeaveCommand command) throws DataAccessException {
+    private void leaveGame(Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
 
     }
 
-    private void resign(Session session, String username, ResignCommand command) throws DataAccessException {
+    private void resign(Session session, String username, ResignCommand command) throws IOException, DataAccessException {
 
     }
 
@@ -117,6 +117,8 @@ public class WebSocketHandler {
         return chessGame.game().getBoard();
     }
 
-    private void sendMessage(RemoteEndpoint remote, ErrorMessage errorMessage) {
+    private void sendMessage(RemoteEndpoint remote, ErrorMessage errorMessage) throws IOException {
+        String msg = new Gson().toJson(errorMessage);
+        remote.sendString(msg);
     }
 }
