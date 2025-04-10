@@ -9,20 +9,28 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(String playerName, Session session) {
+    public void add(Integer gameID, String playerName, Session session) {
         var connection = new Connection(playerName, session);
-        connections.put(playerName, connection);
+
+        if (connections.get(gameID) == null) {
+            var map = new ConcurrentHashMap<String, Connection>();
+            map.put(playerName, connection);
+            connections.put(gameID, map);
+        }
+        else {
+            connections.get(gameID).put(playerName, connection);
+        }
     }
 
-    public void remove(String playerName) {
-        connections.remove(playerName);
+    public void remove(Integer gameID, String playerName) {
+        connections.get(gameID).remove(playerName);
     }
 
-    public void broadcastToAll(ServerMessage msg) throws IOException {
+    public void broadcastToAll(Integer gameID, ServerMessage msg) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        for (var c : connections.get(gameID).values()) {
             if (c.session.isOpen()) {
                 c.send(serialize(msg));
             } else {
@@ -36,9 +44,9 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcastToOthers(String excludePlayerName, ServerMessage msg) throws IOException {
+    public void broadcastToOthers(Integer gameID, String excludePlayerName, ServerMessage msg) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        for (var c : connections.get(gameID).values()) {
             if (c.session.isOpen()) {
                 if (!c.playerName.equals(excludePlayerName)) {
                     c.send(serialize(msg));
@@ -54,9 +62,9 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcastToRoot(String rootUsername, ServerMessage msg) throws IOException {
+    public void broadcastToRoot(Integer gameID, String rootUsername, ServerMessage msg) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        for (var c : connections.get(gameID).values()) {
             if (c.session.isOpen()) {
                 if (c.playerName.equals(rootUsername)) {
                     c.send(serialize(msg));

@@ -17,6 +17,7 @@ import dataaccess.GameDAO;
 import dataaccess.AuthDAO;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @WebSocket
@@ -37,15 +38,15 @@ public class WebSocketHandler {
         try {
             var command = getCommand(msg);
 
+            Integer gameID = command.getGameID();
+
             String username = getUsername(command.getAuthToken());
 
-            saveSession(command.getGameID(), session); // get it into the connection manager
-
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leaveGame(session, username, (LeaveCommand) command);
-                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case CONNECT -> connect(gameID, session, username, (ConnectCommand) command);
+                case MAKE_MOVE -> makeMove(gameID, session, username, (MakeMoveCommand) command);
+                case LEAVE -> leaveGame(gameID, session, username, (LeaveCommand) command);
+                case RESIGN -> resign(gameID, username, (ResignCommand) command);
             }
         } catch (UnauthorizedException ex) { // from the getUsername func
             // Serializes and sends the error message
@@ -82,33 +83,27 @@ public class WebSocketHandler {
         return auth.username();
     }
 
-    private void saveSession(Integer gameID, Session session) {
-        // because connections is a Map<String, Connection> we need to turn the gameID into a string
-        String id = gameID.toString();
-        connections.add(id, session); // TODO: can't do it like this b/c messages will be broadast to it (I think)
-    }
-
-    private void connect(Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
-        connections.add(username, session);
+    private void connect(Integer gameID, Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
+        connections.add(gameID, username, session);
 
         var game = getCurrentGameBoard(command.getGameID());
         var gameMsg = new LoadGameMessage(game);
-        connections.broadcastToRoot(username, gameMsg);
+        connections.broadcastToRoot(gameID, username, gameMsg);
 
         var notifyStr = String.format("%s has joined the game.", username); // TODO: add player/observer functionality
         var serverMsg = new NotificationMessage(notifyStr);
-        connections.broadcastToOthers(username, serverMsg);
+        connections.broadcastToOthers(gameID, username, serverMsg);
     }
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException {
-
-    }
-
-    private void leaveGame(Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
+    private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException {
 
     }
 
-    private void resign(Session session, String username, ResignCommand command) throws IOException, DataAccessException {
+    private void leaveGame(Integer gameID, Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
+
+    }
+
+    private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException {
 
     }
 
