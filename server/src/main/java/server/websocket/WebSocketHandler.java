@@ -44,10 +44,10 @@ public class WebSocketHandler {
             String username = getUsername(command.getAuthToken());
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(gameID, session, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(gameID, session, username, (MakeMoveCommand) command);
-                case LEAVE -> leaveGame(gameID, session, username, (LeaveCommand) command);
-                case RESIGN -> resign(gameID, username, (ResignCommand) command);
+                case CONNECT -> connect(gameID, session, username);
+                case MAKE_MOVE -> makeMove(gameID, username, (MakeMoveCommand) command);
+                case LEAVE -> leaveGame(gameID, username);
+                case RESIGN -> resign(gameID, username);
             }
         } catch (UnauthorizedException ex) { // from the getUsername func
             // Serializes and sends the error message
@@ -62,7 +62,7 @@ public class WebSocketHandler {
 
     private UserGameCommand getCommand(String msg) {
         var serializer = new Gson();
-        UserGameCommand command = serializer.fromJson(msg, UserGameCommand.class); // TODO: may need to do extra work to deserialize, esp. with MakeMove
+        UserGameCommand command = serializer.fromJson(msg, UserGameCommand.class);
         var commandType = command.getCommandType();
 
         if (commandType == CONNECT) {
@@ -95,7 +95,7 @@ public class WebSocketHandler {
     /*
     Sends LOAD_GAME back to client, and NOTIFICATION to others (including their player color / observing)
      */
-    private void connect(Integer gameID, Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
+    private void connect(Integer gameID, Session session, String username) throws IOException, DataAccessException {
         connections.add(gameID, username, session);
 
         var game = getCurrentGameBoard(gameID);
@@ -116,7 +116,7 @@ public class WebSocketHandler {
      - if move leads to check, checkmate, or stalemate, send NOTIFICATION to all
     Once a game is over, no one may resign or make a move.
      */
-    private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
+    private void makeMove(Integer gameID, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
         var gameData = gameDAO.getGame(gameID);
         var chessGame = gameData.game();
 
@@ -135,7 +135,7 @@ public class WebSocketHandler {
         }
 
         var gson = new Gson();
-        gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+        gameDAO.updateChessGame(gameID, gson.toJson(chessGame));
 
         var board = chessGame.getBoard();
         var gameMsg = new LoadGameMessage(board);
@@ -145,7 +145,7 @@ public class WebSocketHandler {
         var moveMsg = new NotificationMessage(moveStr);
         connections.broadcastToOthers(gameID, username, moveMsg);
 
-        sendCheckMessages(gameID, username, chessGame, gameData);
+        sendCheckMessages(gameID, username, chessGame);
     }
 
     private void checkPlayerTurn(ClientRole role, ChessGame.TeamColor playerTurn) {
@@ -158,13 +158,13 @@ public class WebSocketHandler {
         }
     }
 
-    private void sendCheckMessages(Integer gameID, String username, ChessGame chessGame, GameData gameData) throws IOException, DataAccessException {
+    private void sendCheckMessages(Integer gameID, String username, ChessGame chessGame) throws IOException, DataAccessException {
         var gson = new Gson();
         ChessGame.TeamColor enemyColor = chessGame.getTeamTurn();
 
         if (chessGame.isInCheckmate(enemyColor)) {
             chessGame.markGameAsOver();
-            gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+            gameDAO.updateChessGame(gameID, gson.toJson(chessGame));
             var mateStr = String.format("The game ends in checkmate. %s wins!", username); // TODO: say which player is in checkmate
             var mateMsg = new NotificationMessage(mateStr);
             connections.broadcastToAll(gameID, mateMsg);
@@ -176,7 +176,7 @@ public class WebSocketHandler {
 
         } else if (chessGame.isInStalemate(enemyColor)) {
             chessGame.markGameAsOver();
-            gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+            gameDAO.updateChessGame(gameID, gson.toJson(chessGame));
             var staleMsg = new NotificationMessage("The game ends in stalemate.");
             connections.broadcastToAll(gameID, staleMsg);
         }
@@ -186,7 +186,7 @@ public class WebSocketHandler {
     Player / observer's connection is removed; a message is broadcast to the other clients.
     If playing the game, they are also cleared from the database.
      */
-    private void leaveGame(Integer gameID, Session session, String username, LeaveCommand command) throws IOException, DataAccessException {
+    private void leaveGame(Integer gameID, String username) throws IOException, DataAccessException {
         var gameData = gameDAO.getGame(gameID);
         var role = getRole(gameData, username);
 
@@ -207,7 +207,7 @@ public class WebSocketHandler {
     Mark the game as over. Once a game is over, no one may resign or make a move.
     Send NOTIFICATION to all
      */
-    private void resign(Integer gameID, String username, ResignCommand command) throws IOException, DataAccessException, IllegalCommandException {
+    private void resign(Integer gameID, String username) throws IOException, DataAccessException, IllegalCommandException {
         var gameData = gameDAO.getGame(gameID);
         var role = getRole(gameData, username);
         var chessGame = gameData.game();
@@ -218,7 +218,7 @@ public class WebSocketHandler {
 
         if (role == ClientRole.WHITE_PLAYER || role == ClientRole.BLACK_PLAYER) {
             chessGame.markGameAsOver();
-            gameDAO.updateChessGame(gameID, new Gson().toJson(gameData));
+            gameDAO.updateChessGame(gameID, new Gson().toJson(chessGame));
 
             var notifyStr = String.format("%s has resigned.", username);
             var serverMsg = new NotificationMessage(notifyStr);
