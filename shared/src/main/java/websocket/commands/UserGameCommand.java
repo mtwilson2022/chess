@@ -29,12 +29,6 @@ public class UserGameCommand {
         RESIGN
     }
 
-    public enum ClientRole {
-        WHITE_PLAYER,
-        BLACK_PLAYER,
-        OBSERVER
-    }
-
     public CommandType getCommandType() {
         return commandType;
     }
