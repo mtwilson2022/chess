@@ -124,6 +124,9 @@ public class WebSocketHandler {
             throw new IllegalCommandException("Error: the game has already ended.");
         }
 
+        // check that it's the player's turn
+        checkPlayerTurn(getRole(gameData, username), chessGame.getTeamTurn());
+
         var move = command.getMove();
         try {
             chessGame.makeMove(move);
@@ -145,19 +148,32 @@ public class WebSocketHandler {
         sendCheckMessages(gameID, username, chessGame, gameData);
     }
 
+    private void checkPlayerTurn(ClientRole role, ChessGame.TeamColor playerTurn) {
+        if (role == ClientRole.OBSERVER) {
+            throw new IllegalCommandException("Error: observers may not make moves.");
+        } else if (role == ClientRole.WHITE_PLAYER && playerTurn == ChessGame.TeamColor.BLACK) {
+            throw new IllegalCommandException("Error: it is the other player's turn.");
+        } else if (role == ClientRole.BLACK_PLAYER && playerTurn == ChessGame.TeamColor.WHITE) {
+            throw new IllegalCommandException("Error: it is the other player's turn.");
+        }
+    }
+
     private void sendCheckMessages(Integer gameID, String username, ChessGame chessGame, GameData gameData) throws IOException, DataAccessException {
         var gson = new Gson();
         ChessGame.TeamColor enemyColor = chessGame.getTeamTurn();
+
         if (chessGame.isInCheckmate(enemyColor)) {
             chessGame.markGameAsOver();
             gameDAO.updateChessGame(gameID, gson.toJson(gameData));
-            var mateStr = String.format("The game ends in checkmate. %s wins!", username);
+            var mateStr = String.format("The game ends in checkmate. %s wins!", username); // TODO: say which player is in checkmate
             var mateMsg = new NotificationMessage(mateStr);
             connections.broadcastToAll(gameID, mateMsg);
+
         } else if (chessGame.isInCheck(enemyColor)) {
             var checkStr = String.format("%s has moved a piece: [move]", username);
             var checkMsg = new NotificationMessage(checkStr);
             connections.broadcastToAll(gameID, checkMsg);
+
         } else if (chessGame.isInStalemate(enemyColor)) {
             chessGame.markGameAsOver();
             gameDAO.updateChessGame(gameID, gson.toJson(gameData));
