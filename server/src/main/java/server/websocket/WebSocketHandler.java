@@ -1,6 +1,8 @@
 package server.websocket;
 
 import chess.ChessBoard;
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
@@ -96,7 +98,7 @@ public class WebSocketHandler {
     private void connect(Integer gameID, Session session, String username, ConnectCommand command) throws IOException, DataAccessException {
         connections.add(gameID, username, session);
 
-        var game = getCurrentGameBoard(command.getGameID());
+        var game = getCurrentGameBoard(gameID);
         var gameMsg = new LoadGameMessage(game);
         connections.broadcastToRoot(gameID, username, gameMsg);
 
@@ -116,13 +118,52 @@ public class WebSocketHandler {
      */
     private void makeMove(Integer gameID, Session session, String username, MakeMoveCommand command) throws IOException, DataAccessException, IllegalCommandException {
         var gameData = gameDAO.getGame(gameID);
-        var role = getRole(gameData, username);
         var chessGame = gameData.game();
 
         if (chessGame.isGameOver()) {
             throw new IllegalCommandException("Error: the game has already ended.");
         }
 
+        var move = command.getMove();
+        try {
+            chessGame.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new IllegalCommandException("Error: that move is invalid.");
+        }
+
+        var gson = new Gson();
+        gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+
+        var board = chessGame.getBoard();
+        var gameMsg = new LoadGameMessage(board);
+        connections.broadcastToAll(gameID, gameMsg);
+
+        var moveStr = String.format("%s has moved a piece: [move]", username);
+        var moveMsg = new NotificationMessage(moveStr);
+        connections.broadcastToOthers(gameID, username, moveMsg);
+
+        sendCheckMessages(gameID, username, chessGame, gameData);
+    }
+
+    private void sendCheckMessages(Integer gameID, String username, ChessGame chessGame, GameData gameData) throws IOException, DataAccessException {
+        var gson = new Gson();
+        ChessGame.TeamColor enemyColor = chessGame.getTeamTurn();
+        if (chessGame.isInCheckmate(enemyColor)) {
+            chessGame.markGameAsOver();
+            gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+            var mateStr = String.format("The game ends in checkmate. %s wins!", username);
+            var mateMsg = new NotificationMessage(mateStr);
+            connections.broadcastToAll(gameID, mateMsg);
+        } else if (chessGame.isInCheck(enemyColor)) {
+            var checkStr = String.format("%s has moved a piece: [move]", username);
+            var checkMsg = new NotificationMessage(checkStr);
+            connections.broadcastToAll(gameID, checkMsg);
+        } else if (chessGame.isInStalemate(enemyColor)) {
+            chessGame.markGameAsOver();
+            gameDAO.updateChessGame(gameID, gson.toJson(gameData));
+            var staleMsg = new NotificationMessage("The game ends in stalemate.");
+            connections.broadcastToAll(gameID, staleMsg);
+        }
     }
 
     /*
