@@ -1,13 +1,10 @@
 package ui;
 
-import websocket.ServerMessageObserver;
-import websocket.messages.ServerMessage;
-
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl implements ServerMessageObserver {
+public class Repl {
     private final Client client;
     private final State state;
 
@@ -58,11 +55,5 @@ public class Repl implements ServerMessageObserver {
         } else if (state == State.GAMEPLAY) {
             System.out.print(SET_TEXT_COLOR_GREEN + "Let the games begin..." + SET_TEXT_COLOR_WHITE);
         }
-    }
-
-    @Override
-    public void notify(ServerMessage message) {
-        System.out.print(message.toString()); // TODO: fix toString. And figure out if this is even useful for my implementation
-        printPrompt();
     }
 }

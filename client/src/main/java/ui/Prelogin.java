@@ -63,7 +63,7 @@ public class Prelogin implements Client {
         var res = server.register(username, password, email);
         System.out.printf("%s registered successfully!\n", username);
 
-        var repl = beginPostLoginLoop(res.authToken());
+        var repl = beginPostLoginLoop(res.authToken(), res.username());
         repl.run();
 
         return PRE_LOGIN;
