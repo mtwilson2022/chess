@@ -17,13 +17,15 @@ public class Postlogin implements Client {
     private final ServerFacade server;
     private final String serverUrl;
     private final String authToken;
+    private final String username;
     private final Map<Integer, List<String>> gamesInfo;
     private final Map<Integer, Integer> gameIDs;
 
-    public Postlogin(String url, String auth) {
+    public Postlogin(String url, String auth, String username) {
         serverUrl = url;
         server = new ServerFacade(serverUrl);
         authToken = auth;
+        this.username = username;
         gamesInfo = new HashMap<>();
         gameIDs = new HashMap<>();
     }
@@ -194,7 +196,7 @@ public class Postlogin implements Client {
     }
 
     private Repl beginGameplayLoop(Integer gameID) throws ResponseException {
-        var client = new Gameplay(serverUrl, authToken, gameID);
+        var client = new Gameplay(serverUrl, authToken, gameID, username);
         client.connectGame();
         return new Repl(client, GAMEPLAY);
     }

@@ -1,11 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -106,6 +105,95 @@ public class ChessBoardPrinter {
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
         out.print(" " + num + " ");
+    }
+
+
+    public static void highlightMovesForWhite(PrintStream out, String[][] board, Collection<ChessMove> moves) {
+        var white = ChessGame.TeamColor.WHITE;
+        printLabelRow(out, white);
+
+        var squares = getPositions(moves);
+        for (int row = 7; row >=0; row--) {
+            highlightRowOfSquares(out, row, board, white, squares);
+        }
+
+        printLabelRow(out, white);
+    }
+
+    public static void highlightMovesForBlack(PrintStream out, String[][] board, Collection<ChessMove> moves) {
+        var black = ChessGame.TeamColor.BLACK;
+        printLabelRow(out, black);
+
+        var squares = getPositions(moves);
+        for (int row = 0; row < 8; row++) {
+            highlightRowOfSquares(out, row, board, black, squares);
+        }
+
+        printLabelRow(out, black);
+    }
+
+    private static Integer[][] getPositions(Collection<ChessMove> moves) {
+        Integer[][] movesBoard = new Integer[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                movesBoard[i][j] = 0;
+            }
+        }
+
+        for (var move : moves) {
+            var end = move.getEndPosition();
+            int row = end.getRow();
+            int col = end.getColumn();
+            movesBoard[row][col] = 1;
+        }
+        var start = moves.iterator().next().getStartPosition();
+        movesBoard[start.getRow()][start.getColumn()] = 2;
+
+        return movesBoard;
+    }
+
+    private static void highlightRowOfSquares(PrintStream out, int row, String[][] board, ChessGame.TeamColor color, Integer[][] moves) {
+        printRowNumber(out, row);
+
+        String[] boardRow = board[row];
+
+        // columns need to be printed in same order for the white player, reverse order for the black player
+        if (color == ChessGame.TeamColor.WHITE) {
+            for (int col = 0; col < 8; col++) {
+                printSquare(out, row, moves, boardRow, col);
+            }
+        } else {
+            for (int col = 7; col >= 0; col--) {
+                printSquare(out, row, moves, boardRow, col);
+            }
+        }
+
+        printRowNumber(out, row);
+
+        out.print(SET_BG_COLOR_BLACK);
+        out.println();
+    }
+
+    private static void printSquare(PrintStream out, int row, Integer[][] moves, String[] boardRow, int col) {
+        String squareColor;
+        if ((row + col) % 2 == 0) {
+            if (moves[row][col] == 1) {
+                squareColor = SET_BG_COLOR_BLUE;
+            } else if (moves[row][col] == 2) {
+                squareColor = SET_BG_COLOR_MAGENTA;
+            } else {
+                squareColor = SET_BG_COLOR_DARK_GREEN;
+            }
+        } else {
+            if (moves[row][col] == 1) {
+                squareColor = SET_BG_COLOR_YELLOW;
+            } else if (moves[row][col] == 2) {
+                squareColor = SET_BG_COLOR_MAGENTA;
+            } else {
+                squareColor = SET_BG_COLOR_LIGHT_GREY;
+            }
+        }
+        out.print(squareColor + boardRow[col]);
     }
 
     public static String[][] boardGenerator(ChessBoard chessBoard) {

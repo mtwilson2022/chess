@@ -1,38 +1,36 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
+import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.websocket.WebSocketFacade;
 import websocket.ServerMessageObserver;
-import websocket.commands.*;
 import websocket.messages.*;
 
 import static ui.EscapeSequences.*;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
-import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.*;
 
 import static ui.State.*;
-import static websocket.commands.UserGameCommand.CommandType.*;
 
 public class Gameplay implements Client {
-    // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
-    private final ServerFacade server; // not sure if this will be necessary; we'll see
+    private final ServerFacade server;
     private final WebSocketFacade ws;
     private final String authToken;
     private final int gameID;
+    private final String username;
 
-    public Gameplay(String url, String auth, Integer id) throws ResponseException {
+    public Gameplay(String url, String auth, Integer id, String username) throws ResponseException {
         authToken = auth;
         gameID = id;
+        this.username = username;
         server = new ServerFacade(url);
 
         ws = new WebSocketFacade(url, new ServerMessageObserver() {
@@ -100,8 +98,26 @@ public class Gameplay implements Client {
     Redraws the board upon the user's request.
      */
     private void redrawBoard() throws ResponseException {
-        // let's do this later.
-        // may use http rather than ws? If so, then move this out of WSF
+        var games = server.listGames(authToken);
+        GameData gameData = getGameData(games);
+        ChessBoard board = gameData.game().getBoard();
+        var printBoard = ChessBoardPrinter.boardGenerator(board);
+
+        var stream = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        if (gameData.blackUsername().equals(username)) {
+            ChessBoardPrinter.printBoardForBlack(stream, printBoard);
+        } else {
+            ChessBoardPrinter.printBoardForWhite(stream, printBoard);
+        }
+    }
+
+    private GameData getGameData(GameData[] games) throws ResponseException {
+        for (var game : games) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
+        }
+        throw new ResponseException(500, "Game not found.");
     }
 
     /*
@@ -197,8 +213,20 @@ public class Gameplay implements Client {
     This is a local operation and has no effect on remote users’ screens.
      */
     private void highlightLegalMoves(ChessPosition position) throws ResponseException {
-        // let's do this later.
-        // may use http rather than ws? If so, take this out of the WSF
+        var games = server.listGames(authToken);
+        GameData gameData = getGameData(games);
+        ChessBoard board = gameData.game().getBoard();
+        var printBoard = ChessBoardPrinter.boardGenerator(board);
+
+        ChessGame game = gameData.game();
+        var moves = game.validMoves(position);
+
+        var stream = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        if (gameData.blackUsername().equals(username)) {
+            ChessBoardPrinter.highlightMovesForBlack(stream, printBoard, moves);
+        } else {
+            ChessBoardPrinter.highlightMovesForWhite(stream, printBoard, moves);
+        }
     }
 
     private String prompt() {

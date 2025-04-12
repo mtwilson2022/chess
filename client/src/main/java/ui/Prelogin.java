@@ -79,7 +79,7 @@ public class Prelogin implements Client {
         var res = server.login(username, password);
         System.out.printf("%s logged in successfully!\n", username);
 
-        var repl = beginPostLoginLoop(res.authToken());
+        var repl = beginPostLoginLoop(res.authToken(), res.username());
         repl.run();
 
         return PRE_LOGIN;
@@ -94,8 +94,8 @@ public class Prelogin implements Client {
         return SET_TEXT_COLOR_BLUE + " >>> " + SET_TEXT_COLOR_WHITE;
     }
 
-    private Repl beginPostLoginLoop(String authToken) {
-        var client = new Postlogin(serverUrl, authToken);
+    private Repl beginPostLoginLoop(String authToken, String username) {
+        var client = new Postlogin(serverUrl, authToken, username);
         return new Repl(client, POST_LOGIN);
     }
 }
