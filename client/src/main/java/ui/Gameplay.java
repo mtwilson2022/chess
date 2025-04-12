@@ -1,21 +1,21 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
-import org.glassfish.grizzly.http.server.Response;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.websocket.WebSocketFacade;
 import websocket.ServerMessageObserver;
-import websocket.commands.LeaveCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.ResignCommand;
-import websocket.messages.ServerMessage;
+import websocket.commands.*;
+import websocket.messages.*;
+import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 import java.io.IOException;
 
 import static ui.State.*;
+import static websocket.commands.UserGameCommand.CommandType.*;
 
 public class Gameplay implements Client {
     // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
@@ -31,10 +31,44 @@ public class Gameplay implements Client {
 
         ws = new WebSocketFacade(url, new ServerMessageObserver() {
             @Override
-            public void notify(ServerMessage message) {
-                // TODO: probably need to deserialize the message once to get subclass, then deserialize again
+            public void notify(String message) {
+                var serverMessage = getMessage(message);
+
+                switch (serverMessage.getServerMessageType()) {
+                    case LOAD_GAME -> printLoadGame((LoadGameMessage) serverMessage);
+                    case ERROR -> printError((ErrorMessage) serverMessage);
+                    case NOTIFICATION -> printNotification((NotificationMessage) serverMessage);
+                }
             }
         });
+    }
+
+    private ServerMessage getMessage(String msg) {
+        var serializer = new Gson();
+        ServerMessage message = new Gson().fromJson(msg, ServerMessage.class);
+        var messageType = message.getServerMessageType();
+
+        if (messageType == LOAD_GAME) {
+            return serializer.fromJson(msg, LoadGameMessage.class);
+        } else if (messageType == ERROR) {
+            return serializer.fromJson(msg, ErrorMessage.class);
+        } else if (messageType == NOTIFICATION) {
+            return serializer.fromJson(msg, NotificationMessage.class);
+        } else {
+            throw new RuntimeException("Message has no ServerMessageType field.");
+        }
+    }
+
+    private void printLoadGame(LoadGameMessage message) {
+
+    }
+
+    private void printError(ErrorMessage message) {
+
+    }
+
+    private void printNotification(NotificationMessage message) {
+
     }
 
     @Override
@@ -69,15 +103,17 @@ public class Gameplay implements Client {
     The client transitions back to the Post-Login UI.
      */
     private void leaveGame() throws ResponseException {
-        // call the WSF method in here
+        ws.leaveGame(authToken, gameID);
     }
 
     /*
     Allow the user to input what move they want to make. The board is updated to reflect the result of the move,
     and the board automatically updates on all clients involved in the game.
      */
-    private void makeMove(ChessMove move) throws ResponseException {
-
+    private void makeMove() throws ResponseException {
+        // TODO: do clienty stuff that other clients do
+//        var move = new ChessMove();
+//        ws.makeMove(authToken, gameID, move);
     }
 
     /*
@@ -85,7 +121,9 @@ public class Gameplay implements Client {
     Does not cause the user to leave the game.
      */
     private void resign() throws ResponseException {
+        // TODO: "are you sure you want to do this?"
 
+        ws.resign(authToken, gameID);
     }
 
     /*
