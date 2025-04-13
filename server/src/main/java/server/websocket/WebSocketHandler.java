@@ -1,8 +1,6 @@
 package server.websocket;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
@@ -19,6 +17,7 @@ import dataaccess.GameDAO;
 import dataaccess.AuthDAO;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 @WebSocket
@@ -102,7 +101,15 @@ public class WebSocketHandler {
         var gameMsg = new LoadGameMessage(game);
         connections.broadcastToRoot(gameID, username, gameMsg);
 
-        var notifyStr = String.format("%s has joined the game.", username); // TODO: add player/observer functionality
+        var gameData = gameDAO.getGame(gameID);
+        var role = getRole(gameData, username);
+        String type = switch (role) {
+            case WHITE_PLAYER -> "white";
+            case BLACK_PLAYER -> "black";
+            case OBSERVER -> "an observer";
+        };
+
+        var notifyStr = String.format("%s has joined the game as %s.", username, type);
         var serverMsg = new NotificationMessage(notifyStr);
         connections.broadcastToOthers(gameID, username, serverMsg);
     }
@@ -141,11 +148,26 @@ public class WebSocketHandler {
         var gameMsg = new LoadGameMessage(board);
         connections.broadcastToAll(gameID, gameMsg);
 
-        var moveStr = String.format("%s has moved a piece: [move]", username);
+        var moveStr = String.format("%s has moved a piece: %s", username, parseMove(move));
         var moveMsg = new NotificationMessage(moveStr);
         connections.broadcastToOthers(gameID, username, moveMsg);
 
         sendCheckMessages(gameID, username, chessGame);
+    }
+
+    private String parseMove(ChessMove input) {
+        var startPos = input.getStartPosition();
+        String startCol = getColLetter(startPos.getColumn());
+
+        var endPos = input.getEndPosition();
+        String endCol = getColLetter(endPos.getColumn());
+
+        return String.format("%s%d -> %s%d", startCol, startPos.getRow(), endCol, endPos.getRow());
+    }
+
+    private String getColLetter(int col) {
+        Map<Integer, String> cols = Map.of(1, "A", 2, "B", 3, "C", 4, "D", 5, "E", 6, "F", 7, "G", 8, "H");
+        return cols.get(col);
     }
 
     private void checkPlayerTurn(ClientRole role, ChessGame.TeamColor playerTurn) {
@@ -161,22 +183,37 @@ public class WebSocketHandler {
     private void sendCheckMessages(Integer gameID, String username, ChessGame chessGame) throws IOException, DataAccessException {
         var gson = new Gson();
         ChessGame.TeamColor enemyColor = chessGame.getTeamTurn();
+        var gameData = gameDAO.getGame(gameID);
 
         if (chessGame.isInCheckmate(enemyColor)) {
             chessGame.markGameAsOver();
             gameDAO.updateChessGame(gameID, gson.toJson(chessGame));
-            var mateStr = String.format("The game ends in checkmate. %s wins!", username); // TODO: say which player is in checkmate
+
+            String opponent;
+            if (enemyColor == ChessGame.TeamColor.WHITE) {
+                opponent = gameData.whiteUsername();
+            } else {
+                opponent = gameData.blackUsername();
+            }
+            var mateStr = String.format("%s is in checkmate. %s wins!", opponent, username);
             var mateMsg = new NotificationMessage(mateStr);
             connections.broadcastToAll(gameID, mateMsg);
 
         } else if (chessGame.isInCheck(enemyColor)) {
-            var checkStr = String.format("%s has moved a piece: [move]", username);
+            String opponent;
+            if (enemyColor == ChessGame.TeamColor.WHITE) {
+                opponent = gameData.whiteUsername();
+            } else {
+                opponent = gameData.blackUsername();
+            }
+            var checkStr = String.format("%s is in check.", opponent);
             var checkMsg = new NotificationMessage(checkStr);
             connections.broadcastToAll(gameID, checkMsg);
 
         } else if (chessGame.isInStalemate(enemyColor)) {
             chessGame.markGameAsOver();
             gameDAO.updateChessGame(gameID, gson.toJson(chessGame));
+
             var staleMsg = new NotificationMessage("The game ends in stalemate.");
             connections.broadcastToAll(gameID, staleMsg);
         }

@@ -43,7 +43,7 @@ public class Repl {
         } else if (state == State.POST_LOGIN) {
             System.out.print(RESET_BG_COLOR + SET_TEXT_COLOR_YELLOW + ">>> " + SET_TEXT_COLOR_WHITE);
         } else if (state == State.GAMEPLAY) {
-            System.out.print(RESET_BG_COLOR + SET_TEXT_COLOR_GREEN + ">>> " + SET_TEXT_COLOR_WHITE);
+            System.out.print(RESET_BG_COLOR + "\n" + SET_TEXT_COLOR_WHITE);
         }
     }
 
@@ -53,7 +53,7 @@ public class Repl {
         } else if (state == State.POST_LOGIN) {
             System.out.println(SET_TEXT_COLOR_YELLOW + "Welcome to the Game Center." + SET_TEXT_COLOR_WHITE);
         } else if (state == State.GAMEPLAY) {
-            System.out.print(SET_TEXT_COLOR_GREEN + "Let the games begin..." + SET_TEXT_COLOR_WHITE);
+            System.out.println(SET_TEXT_COLOR_GREEN + "Let the games begin..." + SET_TEXT_COLOR_WHITE);
         }
     }
 }

@@ -142,12 +142,12 @@ public class ChessBoardPrinter {
 
         for (var move : moves) {
             var end = move.getEndPosition();
-            int row = end.getRow();
-            int col = end.getColumn();
+            int row = end.getRow() - 1;
+            int col = end.getColumn() - 1;
             movesBoard[row][col] = 1;
         }
         var start = moves.iterator().next().getStartPosition();
-        movesBoard[start.getRow()][start.getColumn()] = 2;
+        movesBoard[start.getRow() - 1][start.getColumn() - 1] = 2;
 
         return movesBoard;
     }

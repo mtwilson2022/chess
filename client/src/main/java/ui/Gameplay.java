@@ -74,6 +74,7 @@ public class Gameplay implements Client {
             } else {
                 ChessBoardPrinter.printBoardForWhite(stream, board);
             }
+            System.out.println();
         } catch (ResponseException e) {
             System.out.print("An error occurred while retrieving the game.");
         }
@@ -82,11 +83,13 @@ public class Gameplay implements Client {
     private void printError(ErrorMessage message) {
         String words = message.getErrorMessage();
         System.out.print(SET_TEXT_COLOR_RED + words + SET_TEXT_COLOR_WHITE);
+        System.out.println();
     }
 
     private void printNotification(NotificationMessage message) {
         String words = message.getMessage();
         System.out.print(SET_TEXT_COLOR_BLUE + words + SET_TEXT_COLOR_WHITE);
+        System.out.println();
     }
 
     @Override
@@ -136,11 +139,12 @@ public class Gameplay implements Client {
         var printBoard = ChessBoardPrinter.boardGenerator(board);
 
         var stream = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        if (gameData.blackUsername().equals(username)) {
+        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
             ChessBoardPrinter.printBoardForBlack(stream, printBoard);
         } else {
             ChessBoardPrinter.printBoardForWhite(stream, printBoard);
         }
+        System.out.println();
 
         return GAMEPLAY;
     }
@@ -170,7 +174,7 @@ public class Gameplay implements Client {
      */
     private State makeMove() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter a move to make. Format it like this: [start col][start row] -> [end col][end row]." +
+        System.out.print("Enter a move to make. Format it like this: [start col][start row] -> [end col][end row]." + "\n" +
                 "If promoting a pawn, end by typing the capital letter of the piece you want to promote to." + prompt());
         String moveText = scanner.nextLine();
 
@@ -272,11 +276,12 @@ public class Gameplay implements Client {
         var moves = game.validMoves(position);
 
         var stream = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        if (gameData.blackUsername().equals(username)) {
+        if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
             ChessBoardPrinter.highlightMovesForBlack(stream, printBoard, moves);
         } else {
             ChessBoardPrinter.highlightMovesForWhite(stream, printBoard, moves);
         }
+        System.out.println();
 
         return GAMEPLAY;
     }

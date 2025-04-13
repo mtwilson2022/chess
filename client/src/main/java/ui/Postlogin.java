@@ -1,19 +1,15 @@
 package ui;
 
-import chess.ChessBoard;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static ui.EscapeSequences.*;
 import static ui.State.*;
 
 public class Postlogin implements Client {
-    // Phase 6: (?) add a private final String serverURL and initialize in the constructor (for WebSocket)
     private final ServerFacade server;
     private final String serverUrl;
     private final String authToken;
@@ -119,7 +115,6 @@ public class Postlogin implements Client {
         System.out.println();
     }
 
-    // TODO: begin Gameplay REPL and connect user through gameplay connect() function
     private State playGame() throws ResponseException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to join" + prompt());
@@ -135,31 +130,18 @@ public class Postlogin implements Client {
             return POST_LOGIN;
         }
 
-        ChessBoard board = new ChessBoard();
-        board.resetBoard();
-        String[][] gameBoard = ChessBoardPrinter.boardGenerator(board); // change in phase 6
-
         System.out.print("Enter a color to play as (either 'white' or 'black')" + prompt());
         String playerColor = scanner.nextLine();
 
         server.joinGame(authToken, playerColor, gameIDs.get(gameNum));
 
-        // phase 5: draw board from white/black's perspective
-        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        if (playerColor.equalsIgnoreCase("white")) {
-            ChessBoardPrinter.printBoardForWhite(out, gameBoard);
-        } else if (playerColor.equalsIgnoreCase("black")) {
-            ChessBoardPrinter.printBoardForBlack(out, gameBoard);
-        } else {
-            System.out.print("That player color does not exist. You may play as 'white' or 'black'.\n");
-            return POST_LOGIN;
-        }
+        var repl = beginGameplayLoop(gameIDs.get(gameNum));
+        repl.run();
 
         return POST_LOGIN;
     }
 
-    // TODO: begin Gameplay REPL and connect user
-    private State observeGame() { // throws ResponseException
+    private State observeGame() throws ResponseException {
         // phase 5: draw board from White's perspective
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the number of the game you want to observe" + prompt());
@@ -173,11 +155,8 @@ public class Postlogin implements Client {
         if (gameInfo == null) {
             System.out.print("No game with that number exists. Enter 'l' to see a list of games and their numbers.\n");
         } else {
-            PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            String[][] gameBoard = ChessBoardPrinter.boardGenerator(board); // change in phase 6
-            ChessBoardPrinter.printBoardForWhite(out, gameBoard);
+            var repl = beginGameplayLoop(gameIDs.get(gameNum));
+            repl.run();
         }
 
         return POST_LOGIN;
